@@ -25,20 +25,24 @@
 #
 # print(gcd_from_keyboard_input())
 
-# # Exercise 2
+# Exercise 2
 # example_string = "abracadabra trick is the most interesting in your show"
 # number_of_vowels = 0
 # for letter in "aeiou":
 #     number_of_vowels += example_string.lower().count(letter)
 # print("Number of vowels in %8s: %d" % (f"{example_string!r}", number_of_vowels))
 #
-# # Exercise 3
-# print("Give me the first string: ")
-# string_first = input()
-# print("Give me the second string: ")
-# string_second = input()
-# count = string_first.count(string_second)
-# print("Number of occurrences of %8s in %8s: %d" % (f"{string_first!r}", f"{string_second!r}", count))
+# Exercise 3
+print("Give me the first string: ")
+string_first = input()
+print("Give me the second string: ")
+string_second = input()
+string_second_copy = string_second
+count = 0
+while string_second.find(string_first) != -1:
+    count = count + 1
+    string_second = string_second[string_second.find(string_first) + 1:]
+print("Number of occurrences of %8s in %8s: %d" % (f"{string_first!r}", f"{string_second_copy!r}", count))
 
 # # Exercise 4
 # example_string = "ThisStringIsNotWrittenInUpperCamelCaseAnymore"
@@ -64,34 +68,34 @@
 #             example_string = example_string[:index] + letter.lower() + example_string[index + 1:]
 # print(example_string)
 
-# Exercise 5
-import sys
-
-print("Give me the number of rows and cols for your square matrix: ")
-rows_cols = input()
-if not rows_cols.isdigit():
-    print("Number of rows/columns is not of integer type")
-else:
-    rows_cols = int(rows_cols)
-    letter_matrix = [['' for _ in range(rows_cols)] for _ in range(rows_cols)]
-    print("Now give me the matrix: ")
-    for i in range(0, rows_cols):
-        for j in range(0, rows_cols):
-            letter_matrix[i][j] = sys.stdin.read(1)
-        sys.stdin.read(1)
-    left_up_row = 0
-    right_down_row = rows_cols
-    while left_up_row < right_down_row:
-        for j in range(left_up_row, right_down_row):
-            print(letter_matrix[left_up_row][j], end='')
-        for i in range(left_up_row + 1, right_down_row):
-            print(letter_matrix[i][right_down_row - 1], end='')
-        for j in range(right_down_row - 2, left_up_row - 1, -1):
-            print(letter_matrix[right_down_row - 1][j], end='')
-        for i in range(right_down_row - 2, left_up_row, -1):
-            print(letter_matrix[i][left_up_row], end='')
-        left_up_row = left_up_row + 1
-        right_down_row = right_down_row - 1
+# # Exercise 5
+# import sys
+#
+# print("Give me the number of rows and cols for your square matrix: ")
+# rows_cols = input()
+# if not rows_cols.isdigit():
+#     print("Number of rows/columns is not of integer type")
+# else:
+#     rows_cols = int(rows_cols)
+#     letter_matrix = [['' for _ in range(rows_cols)] for _ in range(rows_cols)]
+#     print("Now give me the matrix: ")
+#     for i in range(0, rows_cols):
+#         for j in range(0, rows_cols):
+#             letter_matrix[i][j] = sys.stdin.read(1)
+#         sys.stdin.read(1)
+#     left_up_row = 0
+#     right_down_row = rows_cols
+#     while left_up_row < right_down_row:
+#         for j in range(left_up_row, right_down_row):
+#             print(letter_matrix[left_up_row][j], end='')
+#         for i in range(left_up_row + 1, right_down_row):
+#             print(letter_matrix[i][right_down_row - 1], end='')
+#         for j in range(right_down_row - 2, left_up_row - 1, -1):
+#             print(letter_matrix[right_down_row - 1][j], end='')
+#         for i in range(right_down_row - 2, left_up_row, -1):
+#             print(letter_matrix[i][left_up_row], end='')
+#         left_up_row = left_up_row + 1
+#         right_down_row = right_down_row - 1
 
 # # Exercise 6
 # def is_palindrome(number):
@@ -117,8 +121,8 @@ else:
 #             return "%d is palindrome" % initial_number
 #         else:
 #             return "%d is not palindrome" % initial_number
-
-
+#
+#
 # print(is_palindrome(154456))
 # print(is_palindrome(15456))
 # print(is_palindrome(1325775231))

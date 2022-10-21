@@ -1,58 +1,71 @@
 import math
 
 
-# # Exercise 1
-# def fibonacci(n):
-#     result = []
-#     fibo1 = 1
-#     fibo2 = 1
-#     if type(n) != int or n < 1:
-#         return "This is not a valid parameter."
-#     if n >= 1:
-#         result.append(fibo1)
-#     if n >= 2:
-#         result.append(fibo2)
-#     for i in range(3, n + 1):
-#         fibo3 = fibo1 + fibo2
-#         result.append(fibo3)
-#         fibo1 = fibo2
-#         fibo2 = fibo3
-#     return result
-#
-#
-# print(fibonacci("-2"))
-# print(fibonacci(1))
-# print(fibonacci(2))
-# print(fibonacci(10))
+# Exercise 1
+def fibonacci(n):
+    result = []
+    fibo1 = 1
+    fibo2 = 1
+    if type(n) != int or n < 1:
+        return "This is not a valid parameter."
+    if n >= 1:
+        result.append(fibo1)
+    if n >= 2:
+        result.append(fibo2)
+    for i in range(3, n + 1):
+        fibo3 = fibo1 + fibo2
+        result.append(fibo3)
+        fibo1 = fibo2
+        fibo2 = fibo3
+    return result
 
 
-# # Exercise 2
-# def select_primes(list_of_numbers):
-#     list_of_primes = []
-#     for number in list_of_numbers:
-#         if type(number) != int:
-#             return "List element is not of integer type."
-#         if number in (2, -2):
-#             list_of_primes.append(number)
-#         if number > 4 or number < -4:
-#             list_of_proper_divs = [d for d in range(2, int(math.sqrt(abs(number))) + 1) if number % d == 0]
-#             if len(list_of_proper_divs) == 0:
-#                 list_of_primes.append(number)
-#     return list_of_primes
-#
-#
-# print(select_primes([12, "abc", 23, 0, 1, 2, 3, -4, -8, 18, 31, -(-41)]))
-# print(select_primes([12, 23, 0, 1, 2, 3, -4, -8, -31, 18, 31, -(-41)]))
+print(fibonacci("-2"))
+print(fibonacci(1))
+print(fibonacci(2))
+print(fibonacci(20))
+print(fibonacci(0))
 
 
-# # Exercise 3
+# Exercise 2
+def select_primes(list_of_numbers):
+    list_of_primes = []
+    for number in list_of_numbers:
+        if type(number) != int:
+            return "List element is not of integer type."
+        if number in (2, -2):
+            list_of_primes.append(number)
+        if number > 4 or number < -4:
+            list_of_proper_divs = [d for d in range(2, int(math.sqrt(abs(number))) + 1) if number % d == 0]
+            if len(list_of_proper_divs) == 0:
+                list_of_primes.append(number)
+    return list_of_primes
+
+
+print(select_primes([12, "abc", 23, 0, 1, 2, 3, -4, -8, 18, 31, -(-41)]))
+print(select_primes([12, 23, 0, 1, 2, 3, -4, -8, -31, 18, 31, -(-41), 37]))
+
+
+# Exercise 3
 # def set_operations(a, b):
 #     return list(set(a).union(set(b))), list(set(a).intersection(set(b))), \
 #            list(set(a).difference(set(b))), list(set(b).difference(set(a)))
-#
-#
-# print(set_operations([2, 4, 5, 6], [4, 6, 7, 8]))
-# print(set_operations([2, "four", 5, 6], []))
+
+def set_operations(a, b):  # allowing duplicates
+    union = a + b
+    intersection = []
+    for element in set(a):
+        count_element_a = len(list(elem for elem in a if elem == element))
+        count_element_b = len(list(elem for elem in b if elem == element))
+        intersection += [element] * min(count_element_a, count_element_b)
+    difference_a = list(elem for elem in a if len([instance for instance in b if instance == elem]) == 0)
+    difference_b = list(elem for elem in b if len([instance for instance in a if instance == elem]) == 0)
+    rez_tuple = (union, intersection, difference_a, difference_b)
+    return rez_tuple
+
+
+print(set_operations([2, 2, 4, 4, 5, 6], [4, 6, 7, 8]))
+print(set_operations([2, "four", 5, 6], []))
 
 
 # Exercise 4
@@ -73,6 +86,8 @@ import math
 #     return song
 
 def compose(notes, moves, start):  # modulo version
+    if len(notes) == 0:
+        return "No partiture provided."
     if len(notes) > start >= 0:
         song = [notes[start]]
     else:
@@ -82,10 +97,13 @@ def compose(notes, moves, start):  # modulo version
         if type(move) != int:
             return "Invalid movement given as parameter"
         current_pos += move
-        if current_pos > len(notes):
-            current_pos = current_pos % len(notes)
-        if current_pos < 0:
-            current_pos = len(notes) - ((-1) * current_pos) % len(notes)
+        if len(notes) == 1:
+            current_pos = 0
+        else:
+            if current_pos > len(notes):
+                current_pos = current_pos % len(notes)
+            if current_pos < 0 and len(notes) > 1:
+                current_pos = len(notes) - ((-1) * current_pos) % len(notes)
         song.append(notes[current_pos])
     return song
 
@@ -96,6 +114,9 @@ print(compose(["do", "re", "mi", "fa", "sol"], [1, -3, 4, -5], 2))
 print(compose(["do", "re", "mi", "fa", "sol"], [1, -3, 4, -5], 5))
 print(compose(["do", "re", "mi", "fa", "sol"], [1, -3, 4.5, -5], 3))
 print(compose(["do", "re", "mi", "fa", "sol"], [22, -22], 4))
+print(compose([], [22, -22], 4))
+print(compose(["do"], [22, -22], 0))
+print(compose(["do", "re", "mi", "fa", "sol", "la", "si", "do"], [21, -22, -5, 8], 4))
 
 
 # # Exercise 5

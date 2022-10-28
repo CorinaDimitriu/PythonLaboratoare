@@ -1,5 +1,7 @@
-# Exercitiul 1
 from itertools import product
+
+
+# Exercitiul 1
 
 
 def set_operations(a, b):

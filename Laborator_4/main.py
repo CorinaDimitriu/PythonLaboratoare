@@ -1,5 +1,6 @@
 import os
 import sys
+import numpy as np
 
 
 # Exercitiul 1
@@ -10,8 +11,8 @@ def sort_extensions(directory):
         extensions = {os.path.splitext(file)[1].removeprefix(".")
                       for file in os.listdir(directory) if os.path.isfile(os.path.join(directory, file))}
         return sorted(list(extensions))
-    except FileNotFoundError as e:
-        return str(e)
+    except FileNotFoundError as exc:
+        return str(exc)
 
 
 print(sort_extensions("D:\\Facultate\\Anul_2\\Semestrul_1\\CDC"))
@@ -28,11 +29,11 @@ def insert_folder_in_file(folder, fisier):
         if not os.path.isfile(fisier):
             raise FileNotFoundError("There is no file at specified path")
         files_starting_A = [os.path.abspath(os.path.join(folder, file)) for file in os.listdir(folder) if
-                            file.startswith('A')]  # if os.path.isfile(os.path.join(folder, file))
+                            os.path.basename(file).startswith('A')]  # if os.path.isfile(os.path.join(folder, file))
         print(*files_starting_A, sep='\n', file=fis, flush=True)
         fis.close()
-    except FileNotFoundError as e:
-        print(str(e))
+    except FileNotFoundError as exc:
+        print(str(exc))
 
 
 insert_folder_in_file("D:\\Facultate\\Anul_2\\Semestrul_1\\CDC", "./ex2.txt")
@@ -192,14 +193,27 @@ print(create_dict("D:\Facultate\Anul_2\Semestrul_2\Criptografie\inexistent"))
 
 
 # Exercitiul 8
-def absolute_paths(dir_path):
+# def absolute_paths(dir_path):
+#     try:
+#         if not os.path.isdir(dir_path):
+#             raise FileNotFoundError("Directory given as argument does not exist")
+#         root = os.path.dirname(dir_path)
+#         if root == dir_path:
+#             raise FileNotFoundError("Root could not be identified")
+#         return [os.path.abspath(file) for file in os.listdir(root) if os.path.isfile(os.path.join(root, file))]
+#     except FileNotFoundError as exc:
+#         return str(exc)
+
+
+def absolute_paths(dir_path):  # recursive version
     try:
         if not os.path.isdir(dir_path):
             raise FileNotFoundError("Directory given as argument does not exist")
         root = os.path.dirname(dir_path)
         if root == dir_path:
             raise FileNotFoundError("Root could not be identified")
-        return [os.path.abspath(file) for file in os.listdir(root) if os.path.isfile(os.path.join(root, file))]
+        return [os.path.abspath(file) for root_rec, dirs, files in os.walk(root) for file in files
+                if os.path.isfile(os.path.join(root, file))]
     except FileNotFoundError as exc:
         return str(exc)
 

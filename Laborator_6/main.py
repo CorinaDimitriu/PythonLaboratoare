@@ -199,7 +199,8 @@ def scroll_directory(regex, path):
         raise ValueError("Wrong parameter types")
     for (root, directories, files) in os.walk(path):
         for fileName in files:
-            if re.match(regex, fileName):
+            fileName = os.path.splitext(fileName)[0]
+            if re.match(regex + '$', fileName):  # if re.match(regex + '$', fileName):
                 print(">>" + fileName)
             elif re.search(regex, fileName):
                 print(fileName)
@@ -208,6 +209,7 @@ def scroll_directory(regex, path):
 try:
     scroll_directory(r"^C.*", "D:\\Facultate\\Anul_2\\Semestrul_1\\CDC")
     scroll_directory(r"C.*", "D:\\Facultate\\Anul_2\\Semestrul_1\\CDC")
+    scroll_directory(r"C6_1", "D:\\Facultate\\Anul_2\\Semestrul_1\\CDC")
 except ValueError as err:
     print(err)
 except FileNotFoundError as err:

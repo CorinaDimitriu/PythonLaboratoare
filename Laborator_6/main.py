@@ -30,26 +30,40 @@ def check_match(pattern, sequence, x):
 
 try:
     print(check_match("07[0-9]{8}", "0740123456", 10))
+    print(check_match("0*", "0000000000", 8))
 except ValueError as exc:
     print(exc)
 
 
-# Exercitiul 3
-def match_regex(text, regex_list):
-    if type(text) != str or type(regex_list) != list \
-            or len([expr for expr in regex_list if type(expr) != str]) > 0:
+# # Exercitiul 3 - text version
+# def match_regex(text, regex_list):
+#     if type(text) != str or type(regex_list) != list \
+#             or len([expr for expr in regex_list if type(expr) != str]) > 0:
+#         return ValueError("Wrong parameter types")
+#     if len(regex_list) == 0:
+#         return ValueError("No regular expression given for filtering")
+#     return [text[i:j] for i in range(len(text)) for j in range(i + 1, len(text) + 1)
+#             if any([re.match(expr + r"$", text[i:j]) for expr in regex_list])]
+#     # expr_combined = "|".join("(" + expr + "$)" for expr in regex_list)
+#     # return [text[i:j] for i in range(len(text)) for j in range(i + 1, len(text) + 1)
+#     #         if re.match(expr_combined, text[i:j])]
+
+
+# Exercitiul 3 - list of strings version
+def match_regex(list_of_strings, regex_list):
+    if type(list_of_strings) != list or type(regex_list) != list or \
+            len([expr for expr in regex_list if type(expr) != str]) > 0 or \
+            len([string for string in list_of_strings if type(string) != str]) > 0:
         return ValueError("Wrong parameter types")
     if len(regex_list) == 0:
         return ValueError("No regular expression given for filtering")
-    return [text[i:j] for i in range(len(text)) for j in range(i + 1, len(text) + 1)
-            if any([re.match(expr + r"$", text[i:j]) for expr in regex_list])]
-    # expr_combined = "|".join("(" + expr + "$)" for expr in regex_list)
-    # return [text[i:j] for i in range(len(text)) for j in range(i + 1, len(text) + 1)
-    #         if re.match(expr_combined, text[i:j])]
+    return [string for string in list_of_strings
+            if any([re.match(expr + r"$", string) for expr in regex_list])]
 
 
 try:
-    print(match_regex("0740123456", [r"07.", r"0."]))
+    # print(match_regex("0740123456", [r"07.", r"0."]))
+    print(match_regex(["078", "044", "02"], [r"07.", r"0."]))
 except ValueError as exc:
     print(exc)
 
@@ -80,6 +94,35 @@ try:
     print(contained_by_xml("./test.xml", dict({"class": "url", "name": "url-form", "data-id": "item"})))
 except (FileNotFoundError, ValueError) as err:
     print(err)
+
+
+# # Exercitiul 4 - other attributes included version
+# def contained_by_xml(path_to_xml, attrs):
+#     content = open(path_to_xml, 'r', encoding='utf-8').read()
+#     if type(attrs) is not dict:
+#         raise ValueError("Wrong parameter type")
+#     regex = r"<([a-z]|[A-Z]|_)([a-z]|[A-Z]|_|[0-9]|\.|-)+\s+("
+#     perm = permutations(attrs)
+#     for combo in list(perm):
+#         regex_variant = "("
+#         for key in combo:
+#             regex_variant += "(" + r"(([a-z]|[A-Z]|_)(\w|\.|-)+=\".*\"\s+)*" + \
+#                              str(key) + "=\"" + str(attrs[key] + "\"")
+#             regex_variant += r")\s+"
+#         regex += regex_variant[:-3] + r"(([a-z]|[A-Z]|_)(\w|\.|-)+=\".*\"\s+)*" + r"\s*)|"
+#     regex = regex[:-1] + r")(>|(\/>))"
+#     occurrences = []
+#     while re.search(regex, content):
+#         occurrence = re.search(regex, content).group()
+#         occurrences.append(occurrence.split(" ")[0][1:])
+#         content = content[content.find(occurrence) + len(occurrence):]
+#     return occurrences
+#
+#
+# try:
+#     print(contained_by_xml("./test.xml", dict({"class": "url", "name": "url-form", "data-id": "item"})))
+# except (FileNotFoundError, ValueError) as err:
+#     print(err)
 
 
 # Exercitiul 5
@@ -113,7 +156,7 @@ def censor_words(text):
     text_split = re.split(r"(\W)", text)
     new_text = ""
     for word in text_split:
-        if re.match(r"[aeiou]\w*[aeiou]*", word.lower()):
+        if re.match(r"([aeiou]$|[aeiou]\w*[aeiou]$)", word.lower()):
             word = list(word)
             for index, letter in enumerate(word):
                 if index % 2 == 0:
@@ -125,6 +168,9 @@ def censor_words(text):
 try:
     print(censor_words("aaajajsksliiou"))
     print(censor_words("I iike ,,, . . Python pr /// ogramme"))
+    print(censor_words("aaajajsksl"))
+    print(censor_words("wwajajsksl"))
+    print(censor_words("wwajajskslo"))
     print(censor_words(""))
 except ValueError as err:
     print(err)
@@ -145,6 +191,7 @@ print(validate_CNP("6200229226700"))
 print(validate_CNP("6210229226700"))
 print(validate_CNP("6201231226700"))
 print(validate_CNP("6201131226700"))
+
 
 # Exercitiul 8
 def scroll_directory(regex, path):

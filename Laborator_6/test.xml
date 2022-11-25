@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<note>
-  <to>Tove</to>
-  <from class="url" name="url-form" data-id="item">Jani</from>
-  <_head2ing class="url" data-id="item"  name="url-form">Reminder</_head2ing>
-  <3head2ing class="url" data-id="item"  name="url-form">Reminder</3head2ing>
-  <body class="url" name="url-form">Don't forget me this weekend!</body>
-  <headingsec class="url" fake="fake" data-id="item"  name="url-form">Reminder</headingsec>
-</note>

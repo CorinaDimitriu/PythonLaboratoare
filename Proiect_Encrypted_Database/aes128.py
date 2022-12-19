@@ -1,13 +1,10 @@
 import concurrent.futures
-import shared
-
 import numpy as np
 import random
 
 #  plaintext and key are considered to be in hexadecimal
 plaintext_blocks = ['']
 ciphertext_blocks = ['']
-round_keys = ['']  # round 0-10
 
 s_box = [['63', '7c', '77', '7b', 'f2', '6b', '6f', 'c5', '30', '01', '67', '2b', 'fe', 'd7', 'ab', '76'],
          ['ca', '82', 'c9', '7d', 'fa', '59', '47', 'f0', 'ad', 'd4', 'a2', 'af', '9c', 'a4', '72', 'c0'],
@@ -62,11 +59,11 @@ def divide_ciphertext(ciphertext):
 
 
 def key_schedule(key):
-    global round_keys
-    round_keys[0] = key
+    round_keys = [key]
     for key_round in range(1, 11):
         round_key = compute_round_key(round_keys[key_round - 1], key_round)
         round_keys.append(round_key)
+    return round_keys
 
 
 def compute_round_key(ante_key, key_round):
@@ -83,18 +80,17 @@ def compute_round_key(ante_key, key_round):
     return round_key
 
 
-def apply_main_transformations(plaintext_block, mode):
+def apply_main_transformations(plaintext_block, round_keys, original_block, mode='encrypt'):
     state_matrix = convert_text_into_matrix(plaintext_block)
     if mode == 'encrypt':
         state_matrix = add_round_key(state_matrix, round_keys[0])
         for plain_round in range(1, 11):
             state_matrix = apply_round_transformation(state_matrix, round_keys[plain_round], plain_round)
-        return get_ciphertext(np.transpose(state_matrix))
     elif mode == 'decrypt':
         for plain_round in range(10, 0, -1):
             state_matrix = apply_decryption_round_transformation(state_matrix, round_keys[plain_round], plain_round)
         state_matrix = add_round_key(state_matrix, round_keys[0])
-        return get_ciphertext(np.transpose(state_matrix))
+    return xor_stream(get_ciphertext(np.transpose(state_matrix)), original_block)
 
 
 def convert_text_into_matrix(block):
@@ -228,32 +224,35 @@ def add_one(counter):
 
 def encrypt_aes128(plaintext, key):
     divide_plaintext(plaintext)
-    key_schedule(key)
+    round_keys = key_schedule(key)
     counter = generate_counter()
     iterate_counter = counter
     counters = [iterate_counter]
-    for i in range(len(plaintext_blocks)):
+    for i in range(len(plaintext_blocks) - 1):
         iterate_counter = add_one(iterate_counter)
         counters.append(iterate_counter)
-    if __name__ == "main":
-        parallelize_ctr(counters)
+    return counter, parallelize_ctr(counters, round_keys)
 
 
-def parallelize_ctr(counters):
+def parallelize_ctr(counters, round_keys, mode='encrypt'):
     with concurrent.futures.ProcessPoolExecutor() as executor:
         processes = []
         results = []
         for i in range(len(counters)):
-            p = executor.submit(apply_main_transformations,
-                                plaintext_blocks[i], counters[i])
-            processes.append(p)
+            if mode == 'encrypt':
+                processes.append(executor.submit(apply_main_transformations,
+                                                 counters[i], round_keys, plaintext_blocks[i]))
+            else:
+                processes.append(executor.submit(apply_main_transformations,
+                                                 counters[i], round_keys, ciphertext_blocks[i]))
         for p in processes:
-            p.join()
             results.append(p.result())
         if len(plaintext_blocks[len(plaintext_blocks) - 1]) < 32:
             results[len(results) - 1] = \
                 results[len(results) - 1][:len(plaintext_blocks[len(plaintext_blocks) - 1])]
-        shared.ciphertext = ''.join(result for result in results)
+        ciphertext = ''.join(result for result in results)
+        executor.shutdown()
+        return ciphertext
 
 
 def generate_counter():
@@ -262,10 +261,10 @@ def generate_counter():
 
 def decrypt_aes128(counter, ciphertext, key):
     divide_ciphertext(ciphertext)
-    key_schedule(key)
-    plaintext = ''
-    for block in ciphertext_blocks:
-        plaintext += xor_stream(apply_main_transformations(counter, 'encrypt'),
-                                block)
-        counter = add_one(counter)
-    return plaintext
+    round_keys = key_schedule(key)
+    iterate_counter = counter
+    counters = [iterate_counter]
+    for i in range(len(plaintext_blocks) - 1):
+        iterate_counter = add_one(iterate_counter)
+        counters.append(iterate_counter)
+    return parallelize_ctr(counters, round_keys, 'decrypt')

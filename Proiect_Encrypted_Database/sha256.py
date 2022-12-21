@@ -14,6 +14,12 @@ round_constants = [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0
                    0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2]
 
 
+def initialize_sha256():
+    global hashes
+    hashes = [0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19]
+    convert_hashes_to_binary()
+
+
 def convert_hashes_to_binary():
     global hashes
     hashes = [str(bin(hashes[i]))[2:] for i in range(8)]
@@ -43,7 +49,6 @@ def padding_until_512_less64():
 
 
 def pre_processing():
-    convert_hashes_to_binary()
     add_one()
     padding_until_512_less64()
     add_length()
@@ -165,6 +170,7 @@ def not_operation(bytes_only):
 def execute_sha256(user_plaintext):
     global plaintext
     global original_plaintext
+    initialize_sha256()
     plaintext = user_plaintext
     original_plaintext = user_plaintext
     pre_processing()

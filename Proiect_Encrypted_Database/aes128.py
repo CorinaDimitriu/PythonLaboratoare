@@ -46,10 +46,10 @@ r_con = ['01000000', '02000000', '04000000', '08000000', '10000000', '20000000',
 
 def divide_plaintext(plaintext):
     global plaintext_blocks
-    padding_bytes = 32 - len(plaintext) % 32
-    if padding_bytes == 32:
-        padding_bytes = 0
-    plaintext += ''.join(['0' for x in range(padding_bytes)])
+    # padding_bytes = 32 - len(plaintext) % 32
+    # if padding_bytes == 32:
+    #     padding_bytes = 0
+    # plaintext += ''.join(['0' for x in range(padding_bytes)])
     plaintext_blocks = [plaintext[i:i + 32] for i in range(0, len(plaintext), 32)]
 
 
@@ -80,7 +80,16 @@ def compute_round_key(ante_key, key_round):
     return round_key
 
 
+def pad_with_zeros(block):
+    padding_bytes = 32 - len(block) % 32
+    if padding_bytes == 32:
+        padding_bytes = 0
+    block += ''.join(['0' for x in range(padding_bytes)])
+    return block
+
+
 def apply_main_transformations(plaintext_block, round_keys, original_block, mode='encrypt'):
+    original_block = pad_with_zeros(original_block)
     state_matrix = convert_text_into_matrix(plaintext_block)
     if mode == 'encrypt':
         state_matrix = add_round_key(state_matrix, round_keys[0])
@@ -228,6 +237,8 @@ def encrypt_aes128(plaintext, key):
     counter = generate_counter()
     iterate_counter = counter
     counters = [iterate_counter]
+    if len(plaintext_blocks) < 1:
+        counters = []
     for i in range(len(plaintext_blocks) - 1):
         iterate_counter = add_one(iterate_counter)
         counters.append(iterate_counter)
@@ -235,7 +246,7 @@ def encrypt_aes128(plaintext, key):
 
 
 def parallelize_ctr(counters, round_keys, mode='encrypt'):
-    with concurrent.futures.ProcessPoolExecutor() as executor:
+    with concurrent.futures.ProcessPoolExecutor(max_workers=8) as executor:
         processes = []
         results = []
         for i in range(len(counters)):
@@ -247,9 +258,15 @@ def parallelize_ctr(counters, round_keys, mode='encrypt'):
                                                  counters[i], round_keys, ciphertext_blocks[i]))
         for p in processes:
             results.append(p.result())
-        if len(plaintext_blocks[len(plaintext_blocks) - 1]) < 32:
+        if mode == 'encrypt':
+            length = len(plaintext_blocks)
+            last_length = len(plaintext_blocks[length - 1])
+        else:
+            length = len(ciphertext_blocks)
+            last_length = len(ciphertext_blocks[length - 1])
+        if length > 0 and last_length < 32:
             results[len(results) - 1] = \
-                results[len(results) - 1][:len(plaintext_blocks[len(plaintext_blocks) - 1])]
+                results[len(results) - 1][:last_length]
         ciphertext = ''.join(result for result in results)
         executor.shutdown()
         return ciphertext
@@ -264,6 +281,8 @@ def decrypt_aes128(counter, ciphertext, key):
     round_keys = key_schedule(key)
     iterate_counter = counter
     counters = [iterate_counter]
+    if len(ciphertext_blocks) < 1:
+        counters = []
     for i in range(len(plaintext_blocks) - 1):
         iterate_counter = add_one(iterate_counter)
         counters.append(iterate_counter)

@@ -5,7 +5,7 @@ import sha256
 
 def mgf(mask_length, seed):  # seed is assumed to be an integer
     if type(seed) != int:
-        raise ValueError("Seed must have integer type, in order "
+        raise TypeError("Seed must have integer type, in order "
                          "to be converted using I2OSP")
     seed = str(bin(seed))[2:]
     hLen = 256

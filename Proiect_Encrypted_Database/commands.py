@@ -124,12 +124,15 @@ def retrieve_from_database(name, path):
     return name, encrypted_key
 
 
-def delete_file(name='', path=''):
+def delete_file(name='', path=''):  # if both parameters specified, only name is taken into account
     if name == '' and path == '':
         raise AttributeError("At least one in {name, path} should contain valid value")
     conn = connect_to_database()
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM FILES WHERE Name=? OR PATH=?", name, path)
+    if name == '':
+        cursor.execute("SELECT Name FROM FILES WHERE Path=?", path)
+        name = cursor.fetchone()[0]
+    cursor.execute("DELETE FROM FILES WHERE Name=?", name)
     cursor.commit()
     conn.close()
     return messages.Success
@@ -143,8 +146,10 @@ def solve_command(request_code, params, private_key):  # includes treating excep
             return retrieve_decrypted_file(params[0], params[1], private_key)
         else:  # code for deletion
             return delete_file(params[0], params[1])
-    except FileNotFoundError as exc:
+    except (FileNotFoundError, PermissionError) as exc:
         return messages.FileNotFound + str(exc)
+    except (UnicodeDecodeError, UnicodeEncodeError) as exc:
+        return messages.FileFormat + str(exc)
     except AttributeError as exc:
         return messages.ParameterSpecification + str(exc)
     except pyodbc.DatabaseError as exc:

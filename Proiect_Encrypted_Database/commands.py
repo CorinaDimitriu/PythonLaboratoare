@@ -6,6 +6,7 @@ import bitstring
 
 import aes128
 import messages
+import reader
 import rsa_oaep
 import sha256
 
@@ -63,19 +64,16 @@ def get_metadata(file_path):
 
 def insert_encrypted_file(file_path, name):
     metadata = get_metadata(file_path)
-    file = open(file_path, "rb")
-    content = file.read()
-    content = content.hex()
+    content = reader.read_data(file_path)
     key, counter, ciphertext = aes128.encrypt_aes128(content)
-    file.close()
     full_name = r"D:\Facultate\Anul_3\Python\Proiect_Encrypted_Database\EncryptedDatabase\\" \
                 + name + ".txt"
-    file_db = open(full_name, "wt")
-    file_db.write(counter)
-    file_db.write(ciphertext)
     key = int(key, 16)
     encrypted_key = hex(rsa_oaep.encrypt_rsa_oaep(key))[2:]
     insert_all_data(name, file_path, encrypted_key, metadata)
+    file_db = open(full_name, "wt")
+    file_db.write(counter + ciphertext)
+    file_db.close()
     return messages.Success
 
 
@@ -93,8 +91,9 @@ def insert_all_data(name, file_path, encrypted_key, metadata):
 
 def retrieve_decrypted_file(private_key, name='', path=''):
     if name == '' and path == '':
-        raise AttributeError("At least one in {name, path} should contain valid value")
-    name, encrypted_key = retrieve_from_database(name, path)
+        raise AttributeError(messages.ParameterSpecification +
+                             "At least one in {name, path} should contain valid value")
+    name, path, encrypted_key = retrieve_from_database(name, path)
     decrypted_key = hex(rsa_oaep.decrypt_rsa_oaep(encrypted_key, private_key, 128))[2:]
     crypto_path = r"D:\Facultate\Anul_3\Python\Proiect_Encrypted_Database\EncryptedDatabase\\" \
                   + name + ".txt"
@@ -104,7 +103,7 @@ def retrieve_decrypted_file(private_key, name='', path=''):
     counter = content[:32]
     ciphertext = content[32:]
     hexadecimal = aes128.decrypt_aes128(counter, ciphertext, decrypted_key)
-    return bytes.fromhex(hexadecimal).decode("utf-8")
+    return bytes.fromhex(hexadecimal).decode(reader.get_format(path))
 
 
 def retrieve_from_database(name, path):
@@ -112,29 +111,44 @@ def retrieve_from_database(name, path):
     cursor = conn.cursor()
     if name == '':
         cursor.execute("SELECT Name FROM FILES WHERE Path=?", path)
-        name = cursor.fetchone()[0]
+        result = cursor.fetchone()
+        if result is None:
+            raise AttributeError(messages.NotExistingAnymore)
+        name = result[0]
     cursor.execute("SELECT Encrypted_Key, Path FROM FILES WHERE Name=?", name)
     result = cursor.fetchone()
+    if result is None:
+        raise AttributeError(messages.NotExistingAnymore)
     encrypted_key = int(result[0], 16)
     path = result[1]
     if not os.path.exists(path):
         cursor.execute("UPDATE FILES SET Deleted=? WHERE Name=?", True, name)
     cursor.commit()
     conn.close()
-    return name, encrypted_key
+    return name, path, encrypted_key
 
 
 def delete_file(name='', path=''):  # if both parameters specified, only name is taken into account
     if name == '' and path == '':
-        raise AttributeError("At least one in {name, path} should contain valid value")
+        raise AttributeError(messages.ParameterSpecification +
+                             "At least one in {name, path} should contain valid value")
     conn = connect_to_database()
     cursor = conn.cursor()
     if name == '':
         cursor.execute("SELECT Name FROM FILES WHERE Path=?", path)
-        name = cursor.fetchone()[0]
+        result = cursor.fetchone()
+        if result is None:
+            raise AttributeError(messages.NotExistingAnymore)
+        name = result[0]
+    cursor.execute("SELECT Name FROM FILES WHERE Name=?", name)
+    result = cursor.fetchone()
+    if result is None:
+        raise AttributeError(messages.NotExistingAnymore)
     cursor.execute("DELETE FROM FILES WHERE Name=?", name)
     cursor.commit()
     conn.close()
+    os.remove(r"D:\Facultate\Anul_3\Python\Proiect_Encrypted_Database\EncryptedDatabase\\" \
+              + name + ".txt")
     return messages.Success
 
 
@@ -143,15 +157,17 @@ def solve_command(request_code, params, private_key):  # includes treating excep
         if request_code == 0:  # code for insertion
             return insert_encrypted_file(params[0], params[1])
         elif request_code == 1:  # code for retrieval
-            return retrieve_decrypted_file(params[0], params[1], private_key)
+            return retrieve_decrypted_file(private_key, params[0], params[1])
         else:  # code for deletion
             return delete_file(params[0], params[1])
     except (FileNotFoundError, PermissionError) as exc:
         return messages.FileNotFound + str(exc)
     except (UnicodeDecodeError, UnicodeEncodeError) as exc:
         return messages.FileFormat + str(exc)
+    except IOError as exc:
+        return messages.IOInvalid + str(exc)
     except AttributeError as exc:
-        return messages.ParameterSpecification + str(exc)
+        return str(exc)
     except pyodbc.DatabaseError as exc:
         return messages.DatabaseManipulation + str(exc)
     except (ValueError, TypeError, ArithmeticError) as exc:

@@ -261,10 +261,12 @@ def parallelize_ctr(counters, round_keys, mode='encrypt'):
             results.append(p.result())
         if mode == 'encrypt':
             length = len(plaintext_blocks)
-            last_length = len(plaintext_blocks[length - 1])
+            if length > 0:
+                last_length = len(plaintext_blocks[length - 1])
         else:
             length = len(ciphertext_blocks)
-            last_length = len(ciphertext_blocks[length - 1])
+            if length > 0:
+                last_length = len(ciphertext_blocks[length - 1])
         if length > 0 and last_length < 32:
             results[len(results) - 1] = \
                 results[len(results) - 1][:last_length]
@@ -284,7 +286,7 @@ def decrypt_aes128(counter, ciphertext, key):
     counters = [iterate_counter]
     if len(ciphertext_blocks) < 1:
         counters = []
-    for i in range(len(plaintext_blocks) - 1):
+    for i in range(len(ciphertext_blocks) - 1):
         iterate_counter = add_one(iterate_counter)
         counters.append(iterate_counter)
     return parallelize_ctr(counters, round_keys, 'decrypt')

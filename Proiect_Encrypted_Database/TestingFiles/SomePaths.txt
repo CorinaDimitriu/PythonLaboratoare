@@ -1,0 +1,2 @@
+D:\Facultate\Anul_2\Semestrul_2\Criptografie\Alfabeto.txt
+D:\Facultate\Anul_2\Semestrul_2\Criptografie\Alfabet_Frecventa.txt

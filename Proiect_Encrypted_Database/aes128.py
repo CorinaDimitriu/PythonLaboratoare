@@ -231,10 +231,11 @@ def add_one(counter):
     return hex(1 + int('0x' + counter, 16))[2:]
 
 
-def encrypt_aes128(plaintext, key):
+def encrypt_aes128(plaintext):
+    key = generate_128bits_random()
     divide_plaintext(plaintext)
     round_keys = key_schedule(key)
-    counter = generate_counter()
+    counter = generate_128bits_random()
     iterate_counter = counter
     counters = [iterate_counter]
     if len(plaintext_blocks) < 1:
@@ -242,7 +243,7 @@ def encrypt_aes128(plaintext, key):
     for i in range(len(plaintext_blocks) - 1):
         iterate_counter = add_one(iterate_counter)
         counters.append(iterate_counter)
-    return counter, parallelize_ctr(counters, round_keys)
+    return key, counter, parallelize_ctr(counters, round_keys)
 
 
 def parallelize_ctr(counters, round_keys, mode='encrypt'):
@@ -272,7 +273,7 @@ def parallelize_ctr(counters, round_keys, mode='encrypt'):
         return ciphertext
 
 
-def generate_counter():
+def generate_128bits_random():
     return hex(random.randint(2 ** 127, 2 ** 128 - 1))[2:]
 
 

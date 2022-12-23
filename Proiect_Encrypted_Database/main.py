@@ -38,7 +38,7 @@ def crypto(private_key):
 
     :param private_key: the private (fixed) key derived from computing rsa parameters; keys can be changed
         from this module as well, so their 'time to leave' is decided by the user
-    :type private_key: int
+    :type private_key: (int, int, int)
     """
     command = ''
     while command.lower() != 'exit':
@@ -62,7 +62,7 @@ def extract_keys():
     If the user decides so, keys can be (re)generated, which causes the corresponding files to be overwritten.
 
     :return: the RSA private key
-    :rtype: int
+    :rtype: (int, int, int)
     """
     # create_keys()
     private_file = open("./Keys/PrivateKey.txt", "rt")

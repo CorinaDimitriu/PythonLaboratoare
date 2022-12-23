@@ -18,7 +18,7 @@ def compute_parameters():
     the public key. There is a code block which enforces that e and (p-1), (q-1) are relatively prime to each other.
 
     :return: the pair consisting of one public and one private generated key
-    :rtype: (int, int)
+    :rtype: ((int, int, int) ,(int, int))
     """
     global public_key
     target_e = 2 ** 16 + 1

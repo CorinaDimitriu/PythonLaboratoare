@@ -12,6 +12,13 @@ import sha256
 
 
 def connect_to_database():
+    """
+    This function facilitates connecting the application module to the database in
+    order to perform insertions, retrievals and deletions.
+
+    :return: the connection being opened
+    :rtype: pyodbc.Connection
+    """
     conn = pyodbc.connect(Trusted_Connection='yes',
                           Driver='{ODBC Driver 17 for SQL Server}',
                           Server=r'(localdb)\mssqllocaldb',
@@ -20,6 +27,10 @@ def connect_to_database():
 
 
 def create_files_table():
+    """
+    This function (re)creates the FILES table in order to keep metadata
+    and cryptographic information about the target files.
+    """
     conn = connect_to_database()
     cursor = conn.cursor()
     cursor.execute("DROP TABLE IF EXISTS FILES")
@@ -43,6 +54,14 @@ def create_files_table():
 
 
 def get_metadata(file_path):
+    """
+    This function gathers metadata about the file located at *file_path*.
+
+    :param file_path: the path of the target file
+    :type file_path: str
+    :return: the essential metadata of the target file
+    :rtype: (str, str, int, bool, bool, int, int, str, bool)
+    """
     can_read = os.access(file_path, os.R_OK)
     can_write = os.access(file_path, os.W_OK)
     size = os.path.getsize(file_path)
@@ -63,6 +82,18 @@ def get_metadata(file_path):
 
 
 def insert_encrypted_file(file_path, name):
+    """
+    This is where the upload command is being executed. The file located at *file_path*,
+    along with its metadata, is inserted into the database and will be further identified under *name*.
+    Multiple file formats have been treated (.txt, .docx, .pdf).
+
+    :param file_path: the path to the target file
+    :type file_path: str
+    :param name: the file identifier
+    :type name: str
+    :return: success or error message, depending on the use-cases encountered
+    :rtype: str
+    """
     metadata = get_metadata(file_path)
     content = reader.read_data(file_path)
     key, counter, ciphertext = aes128.encrypt_aes128(content)
@@ -78,6 +109,27 @@ def insert_encrypted_file(file_path, name):
 
 
 def insert_all_data(name, file_path, encrypted_key, metadata):
+    """
+    This is where the database operations regarding the upload command are performed.
+
+    :param name: the unique identifier wished by the user
+    :type name: str
+    :param file_path: the path to the target file
+    :type file_path: str
+    :param encrypted_key: the RSA-encrypted symmetric key used for file encryption
+    :type encrypted_key: str
+    :param metadata: metadata about the target file; includes:
+        absolute path,
+        base file name,
+        size,
+        if read operations are permitted,
+        if write operations are permitted,
+        owner id,
+        group id,
+        hash digest of the file,
+        if the file has been deleted from disk (but the encryption is kept),
+    :type metadata: (str, str, int, bool, bool, int, int, str, bool)
+    """
     conn = connect_to_database()
     cursor = conn.cursor()
     cursor.execute("INSERT INTO FILES(Name, Path, File_Path, Filename, Size_in_bytes, ReadPerm, WritePerm,"
@@ -90,6 +142,24 @@ def insert_all_data(name, file_path, encrypted_key, metadata):
 
 
 def retrieve_decrypted_file(private_key, name='', path=''):
+    """
+    This is where the read command is being executed. The content of the target file is
+    displayed to the user. The content of the file is decrypted using the asymmetric key stored
+    within the database. Multiple file formats have been treated (.txt, .docx, .pdf).
+
+    :param private_key: the private RSA key for decrypting the asymmetric key
+        stored within the FILES table
+    :type private_key: int
+    :param name: the unique identifier of the target file (optional)
+    :type name: str
+    :param path: the path to the target file (optional)
+    :type path: str
+    :return: the content of the target file (as plaintext) or an error message if
+        exceptions have occurred at the retrieval operation
+    :rtype: str
+    :raises AttributeError: if none of the 2 possible identifiers
+        of the file has been specified by the user
+    """
     if name == '' and path == '':
         raise AttributeError(messages.ParameterSpecification +
                              "At least one in {name, path} should contain valid value")
@@ -107,6 +177,19 @@ def retrieve_decrypted_file(private_key, name='', path=''):
 
 
 def retrieve_from_database(name, path):
+    """
+    This is where the database operations regarding the read command are performed.
+
+    :param name: the name of the target file
+    :type name: str
+    :param path: the path where the target file is located
+    :type path: str
+    :return: the name, path (updated if not specified from the very beginning)
+        and the encrypted symmetric key which was used at file encryption
+    :rtype: (str, str, int)
+    :raises AttributeError: if targeted file does not exist within the database
+        (and neither do its identifiers)
+    """
     conn = connect_to_database()
     cursor = conn.cursor()
     if name == '':
@@ -129,6 +212,19 @@ def retrieve_from_database(name, path):
 
 
 def delete_file(name='', path=''):  # if both parameters specified, only name is taken into account
+    """
+    This is where the delete command is being executed.
+
+    :param name: the name of the target file
+    :type name: str
+    :param path: the path where the target file is located
+    :type path: str
+    :return: success or error message, depending on the use-cases encountered
+    :rtype: str
+    :raises AttributeError: if none of the 2 possible identifiers
+        of the file has been specified by the user or if targeted file
+        does not exist within the database (and neither do its identifiers)
+    """
     if name == '' and path == '':
         raise AttributeError(messages.ParameterSpecification +
                              "At least one in {name, path} should contain valid value")
@@ -153,6 +249,23 @@ def delete_file(name='', path=''):  # if both parameters specified, only name is
 
 
 def solve_command(request_code, params, private_key):  # includes treating exceptions
+    """
+    This function implements command solving as far as user's inputs are concerned. After passing
+    through a pre-processing step and acquiring the green flag for validation, the command is split into
+    a request code and its actual parameters (tags for identifying parameters such as **-n** or **-p** are
+    eliminated during pre-processing the input). The request code corresponds to one of the following operations:
+    0 ~ upload; 1 ~ read; 2 ~ delete; 3 ~ exit.
+
+    :param request_code: an integer (from [0-3]) identifying the requested operation
+    :type request_code: int
+    :param params: the actual parameters of the request, regarding the file (name and path)
+    :type params: list[str]
+    :param private_key: the private RSA key serving for decryption of the symmetric key
+        used in AES-128
+    :type private_key: int
+    :return: the result of the operation (file content or specific messages)
+    :rtype: str
+    """
     try:
         if request_code == 0:  # code for insertion
             return insert_encrypted_file(params[0], params[1])

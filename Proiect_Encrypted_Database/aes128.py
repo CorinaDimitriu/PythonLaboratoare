@@ -1,8 +1,12 @@
+"""
+This module performs AES-128 symmetric encryption.
+Plaintext, ciphertext and keys are considered to be in hexadecimal
+"""
+
 import concurrent.futures
 import numpy as np
 import random
 
-#  plaintext and key are considered to be in hexadecimal
 plaintext_blocks = ['']
 ciphertext_blocks = ['']
 
@@ -45,6 +49,12 @@ r_con = ['01000000', '02000000', '04000000', '08000000', '10000000', '20000000',
 
 
 def divide_plaintext(plaintext):
+    """
+    Plaintext is divided into blocks of 128 bits each. Last block might contain less than 128 bits.
+
+    :param plaintext: the original message (the one which is being symmetrically encrypted)
+    :type plaintext: str
+    """
     global plaintext_blocks
     # padding_bytes = 32 - len(plaintext) % 32
     # if padding_bytes == 32:
@@ -54,11 +64,25 @@ def divide_plaintext(plaintext):
 
 
 def divide_ciphertext(ciphertext):
+    """
+    Plaintext is divided into blocks of 128 bits each. Last block might contain less than 128 bits.
+
+    :param ciphertext: the encrypted message (which is about to be decrypted)
+    :type ciphertext: str
+    """
     global ciphertext_blocks
     ciphertext_blocks = [ciphertext[i:i + 32] for i in range(0, len(ciphertext), 32)]
 
 
 def key_schedule(key):
+    """
+    Implementation of the key scheduling algorithm from the AES-128 standard.
+
+    :param key: the base key
+    :type key: str
+    :return: all 11 round keys, the first one being the base key
+    :rtype: list[str]
+    """
     round_keys = [key]
     for key_round in range(1, 11):
         round_key = compute_round_key(round_keys[key_round - 1], key_round)
@@ -67,6 +91,17 @@ def key_schedule(key):
 
 
 def compute_round_key(ante_key, key_round):
+    """
+    Computes one round key. There are 10 rounds in the key scheduling algorithm and
+    this function contains repetitive steps that apply for each of them.
+
+    :param ante_key: the key generated at the previous round (round 0 is the base round)
+    :type ante_key: str
+    :param key_round: the index of the current round
+    :type key_round: int
+    :return: the generated round key
+    :rtype: str
+    """
     w = [ante_key[i:i + 8] for i in range(0, 32, 8)]
     w[3] += (w[3][0:2])
     third_inverse = ''.join([w[3][i + 2:i + 4] for i in range(0, 8, 2)])
@@ -81,6 +116,16 @@ def compute_round_key(ante_key, key_round):
 
 
 def pad_with_zeros(block):
+    """
+    This function aims to add additional zeros to the blocks which are less
+    than 128 bits in length. Due to the fact that blocks are encoded in base16, the required length
+    becomes 32 hexadecimal units.
+
+    :param block: the block to be padded
+    :type block: str
+    :return: the padded block
+    :rtype: str
+    """
     padding_bytes = 32 - len(block) % 32
     if padding_bytes == 32:
         padding_bytes = 0
@@ -89,6 +134,24 @@ def pad_with_zeros(block):
 
 
 def apply_main_transformations(plaintext_block, round_keys, original_block, mode='encrypt'):
+    """
+    Applies the transformation per 128-bits (or less) block, known as:
+    substitution bytes, shift rows, mix columns and addition of round constants.
+    There are 10 rounds, preceded by an initial addition of round constant. The last
+    round lacks the mix columns operation.
+
+    :param plaintext_block: the target block (derived from the counter)
+    :type plaintext_block: str
+    :param round_keys: the round keys previously returned by the key scheduling algorithm
+    :type round_keys: list[str]
+    :param original_block: the initial text (provided that CTR operation mode is used)
+    :type original_block: str
+    :param mode: indicates whether transformations are performed during encryption or decryption.
+        It has 2 possible values, namely encrypt and decrypt, first one being the default value
+    :type mode: str
+    :return: the encrypted/decrypted block
+    :rtype: str
+    """
     original_block = pad_with_zeros(original_block)
     state_matrix = convert_text_into_matrix(plaintext_block)
     if mode == 'encrypt':
@@ -103,17 +166,47 @@ def apply_main_transformations(plaintext_block, round_keys, original_block, mode
 
 
 def convert_text_into_matrix(block):
+    """
+    Hexadecimal string is converted into 4x4 matrix. The matrix takes two hexa units for each
+    of its elements.
+
+    :param block: the 32 hexadecimal units block
+    :type block: str
+    :return: the (transposed) matrix derived from the block
+    :rtype: list[list[str]]
+    """
     matrix = [[block[i:i + 2] for i in range(j, j + 8, 2)] for j in range(0, 32, 8)]
     matrix = np.transpose(matrix)
     return matrix
 
 
 def get_ciphertext(transposed_final_matrix):
+    """
+    AES 4x4 matrix is converted back to hexadecimal string.
+
+    :param transposed_final_matrix: the matrix to be converted
+    :type transposed_final_matrix: list[list[str]]
+    :return: the (transposed) matrix as hexadecimal string
+    :rtype: str
+    """
     return ''.join(transposed_final_matrix[i][j]
                    for i in range(0, 4) for j in range(0, 4))
 
 
 def apply_round_transformation(state_matrix, key, round_no):
+    """
+    This function performs the round transformations on specified block. The block is kept as
+    4x4 state matrix. The same matrix is changed during each round.
+
+    :param state_matrix: the state matrix
+    :type state_matrix: list[list[str]]
+    :param key: the round key
+    :type key: str
+    :param round_no: the index of the round
+    :type round_no: int
+    :return: the new state of the block matrix
+    :rtype: list[list[str]]
+    """
     state_matrix = substitution_bytes(state_matrix, 'standard')
     state_matrix = shift_rows(state_matrix, [0, 1, 2, 3])
     if round_no != 10:
@@ -123,6 +216,19 @@ def apply_round_transformation(state_matrix, key, round_no):
 
 
 def apply_decryption_round_transformation(state_matrix, key, round_no):
+    """
+    The customized succession of operations for decryption. Encryption operations are
+    performed in reverse order (first comes the addition of round constants etc.)
+
+    :param state_matrix: the state matrix of the block being decrypted
+    :type state_matrix: list[list[str]]
+    :param key: the round key
+    :type key: str
+    :param round_no: the round's index
+    :type round_no: int
+    :return: the new state of the block matrix after performing the required operations
+    :rtype: list[list[str]]
+    """
     state_matrix = add_round_key(state_matrix, key)
     if round_no != 10:
         state_matrix = mix_columns(state_matrix, 'inverse')
@@ -132,6 +238,16 @@ def apply_decryption_round_transformation(state_matrix, key, round_no):
 
 
 def add_round_key(state_matrix, key):
+    """
+    The addition of round constants.
+
+    :param state_matrix: the block's state matrix
+    :type state_matrix: list[list[str]]
+    :param key: the round key
+    :type key: str
+    :return: the new state of the block matrix
+    :rtype: list[list[str]]
+    """
     key_matrix = [[key[i:i + 2] for i in range(j, j + 8, 2)] for j in range(0, 32, 8)]
     key_matrix = np.transpose(key_matrix)
     state_matrix = xor_matrix(key_matrix, state_matrix)
@@ -139,10 +255,33 @@ def add_round_key(state_matrix, key):
 
 
 def substitution_bytes(state_matrix, mode):
+    """
+    The bytes substitution operation. The hexadecimal units are replaced with
+    combinations provided by the special s-box matrix.
+
+    :param state_matrix: the block's state matrix
+    :type state_matrix: list[list[str]]
+    :param mode: standard or inverse (every word but standard will be perceived as inverse)
+        There are different s-box matrices depending on the nature of the operation (encryption or decryption)
+    :type mode: str
+    :return: the new state of the block matrix
+    :rtype: list[list[str]]
+    """
     return [[s_box_transformation(state_matrix[i][j], mode) for j in range(4)] for i in range(4)]
 
 
 def shift_rows(state_matrix, shift_per_column):
+    """
+    The rows shifting operation. Rows are left shifted with number of elements
+    provided by *shift_per_column* depending on the row index.
+
+    :param state_matrix: the block's state matrix
+    :type state_matrix: list[list[str]]
+    :param shift_per_column: the number of elements which have to be shifted for each row (index)
+    :type shift_per_column: list[int]
+    :return: the new state of the block matrix
+    :rtype: list[list[str]]
+    """
     new_state_matrix = []
     for i in range(0, 4):
         state_matrix[i] += state_matrix[i]
@@ -152,6 +291,18 @@ def shift_rows(state_matrix, shift_per_column):
 
 
 def mix_columns(state_matrix, mode='standard'):
+    """
+    The addition of round constants.
+
+    :param state_matrix: the block's state matrix
+    :type state_matrix: list[list[str]]
+    :param mode: standard or inverse (every word but standard will be perceived as inverse)
+        The fixed matrix required at this step, which is constant, depends on the operation performed
+        (encryption or decryption)
+    :type mode: str
+    :return: the new state of the block matrix
+    :rtype: list[list[str]]
+    """
     if mode == 'standard':
         fixed_matrix = [['02', '03', '01', '01'],
                         ['01', '02', '03', '01'],
@@ -166,6 +317,17 @@ def mix_columns(state_matrix, mode='standard'):
 
 
 def s_box_transformation(pair, mode='standard'):
+    """
+    The s-box atomic substitution.
+
+    :param pair: a pair of two hexa units identifying the row and column in the (inverse) s-box matrix
+    :type pair: (str, str)
+    :param mode: standard or inverse (every word but standard will be perceived as inverse)
+        The mode corresponds to the operation performed (encryption or decryption)
+    :type mode: str
+    :return: the element located at the intersection of row pair[0] and column pair[1]
+    :rtype: str
+    """
     if mode == 'standard':
         return s_box[int(pair[0], 16)][int(pair[1], 16)]
     else:
@@ -173,17 +335,49 @@ def s_box_transformation(pair, mode='standard'):
 
 
 def xor_stream(key, rcon):
+    """
+    This function is built with the purpose of xoring two hexa strings.
+
+    :param key: the first hexa string
+    :type key: str
+    :param rcon: the second hexa string
+    :type rcon: str
+    :return: the result as hexa string
+    :rtype: str
+    """
     hexadecimal = hex(int('0x' + key, 16) ^ int(rcon, 16))[2:]
     zeros = ''.join(['0' for _ in range(len(key) - len(hexadecimal))])
     return zeros + hexadecimal
 
 
 def xor_matrix(text, key):
+    """
+    This function is built with the purpose of xoring two 4x4 hexa matrices.
+
+    :param text: the first matrix
+    :type text: list[list[str]]
+    :param key: the second matrix
+    :type key: list[list[str]]
+    :return: the result as 4x4 hexa matrix
+    :rtype: list[list[str]]
+    """
     return [[xor_stream(key[i][j], text[i][j])
              for j in range(4)] for i in range(4)]
 
 
 def multiply_stream(y, x):
+    """
+    This function is built with the purpose of multiplying two hexa strings.
+
+    :param x: the first hexa string
+    :type x: str
+    :param y: the second hexa string
+        It only takes values from {01, 02, 03, 09, 0B, 0D, 0E},
+        due to the structure of the fixed matrix used at the mix columns operation
+    :type y: str
+    :return: the result as hexa string
+    :rtype: str
+    """
     # y comes from static matrix
     hexadecimal = hex(int('0x' + x, 16) * int('0x' + y, 16))[2:]
     if y == '02':
@@ -206,6 +400,15 @@ def multiply_stream(y, x):
 
 
 def multiply_by_02(x):
+    """
+    Special multiplication by ``02`` in ``GF(pow(2, 8))`` function.
+    The input and output are still hexa strings.
+
+    :param x: the number aimed to be multiplied by ``02``
+    :type x: str
+    :return: the result of the multiplication operation
+    :rtype: str
+    """
     original_x = x
     x = hex((int('0x' + x, 16) << 1) & 255)[2:]
     if int('0x' + original_x, 16) >= 128:
@@ -214,6 +417,16 @@ def multiply_by_02(x):
 
 
 def multiply_matrices(static_m, dynamic_m):
+    """
+    Multiplication of hexa matrices required at the mix columns operation.
+
+    :param static_m: the fixed matrix
+    :type static_m: list[list[str]]
+    :param dynamic_m: the state matrix
+    :type dynamic_m: list[list[str]]
+    :return: the result matrix
+    :rtype: list[list[str]]
+    """
     new_dynamic_m = []
     for new_lin_index in range(0, 4):
         dynamic_line = []
@@ -228,10 +441,31 @@ def multiply_matrices(static_m, dynamic_m):
 
 
 def add_one(counter):
+    """
+    This function performs adding one operation.
+
+    :param counter: the counter used by the CTR iteration mode
+    :type counter: str
+    :return: ``counter + 1`` (in hexa)
+    :rtype: str
+    """
     return hex(1 + int('0x' + counter, 16))[2:]
 
 
 def encrypt_aes128(plaintext):
+    """
+    This function performs AES-128 encryption in CTR mode. The operations being performed are:
+        * key generation
+        * key scheduling => round keys
+        * counter(s) generation
+        * encrypting counters in AES-128 CBC mode for single words
+        * xoring counters with the original blocks of plaintext
+
+    :param plaintext: the data to be encrypted
+    :type plaintext: str
+    :return: encrypted data
+    :rtype: str
+    """
     key = generate_128bits_random()
     divide_plaintext(plaintext)
     round_keys = key_schedule(key)
@@ -247,6 +481,15 @@ def encrypt_aes128(plaintext):
 
 
 def parallelize_ctr(counters, round_keys, mode='encrypt'):
+    """
+    This function implements the CTR mode for a set of counters through parallelization
+    of the encryption required for each of them.
+
+    :param counters: list[str]
+    :param round_keys: list[str]
+    :param mode: encrypt or decrypt depending on the operation performed on the text blocks
+    :return:
+    """
     with concurrent.futures.ProcessPoolExecutor(max_workers=8) as executor:
         processes = []
         results = []
@@ -276,10 +519,29 @@ def parallelize_ctr(counters, round_keys, mode='encrypt'):
 
 
 def generate_128bits_random():
+    """
+    Exactly 128-bits random generation.
+
+    :return: exactly 128-bits random, converted into hexa string
+    :rtype: str
+    """
     return hex(random.randint(2 ** 127, 2 ** 128 - 1))[2:]
 
 
 def decrypt_aes128(counter, ciphertext, key):
+    """
+    This function performs AES-128 decryption in CTR mode. The operations being performed are:
+        * key generation
+        * key scheduling => round keys
+        * counter(s) generation
+        * encrypting counters in AES-128 CBC mode for single words
+        * xoring counters with the blocks of ciphertext provided through parameter
+
+    :param ciphertext: encrypted data
+    :type ciphertext: str
+    :return: original data
+    :rtype: str
+    """
     divide_ciphertext(ciphertext)
     round_keys = key_schedule(key)
     iterate_counter = counter

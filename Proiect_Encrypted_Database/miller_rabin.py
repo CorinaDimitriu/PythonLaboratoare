@@ -1,3 +1,8 @@
+"""
+This module represents tha ambition to implement the Miller-Rabin primality test.
+"""
+
+
 import random
 import math
 
@@ -14,6 +19,15 @@ low_primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61
 
 
 def decompose_number(number):
+    """
+    In order to prepare for executing the Miller-Rabin primality test, the number
+    is written as ``t * pow(2, s)``, where s is maximized and t is odd.
+
+    :param number: the number to decompose, on which the Miller-Rabin test is to be performed
+    :type number: int
+    :return: s and t, the components of the number's decomposition as described
+    :rtype:
+    """
     t = number - 1
     s = 0
     while t % 2 == 0:
@@ -23,6 +37,15 @@ def decompose_number(number):
 
 
 def miller_rabin_test(number):
+    """
+    The Miller-Rabin primality test implemented.
+
+    :param number: the target number to be tested for primality
+    :type number: int
+    :return: True if the number is prime according to one iteration
+        of the Miller-Rabin test; False, otherwise
+    :rtype: bool
+    """
     (s, t) = decompose_number(number)
     # number = 1 + t * 2^s
     a = random.randint(2, number - 2)
@@ -38,6 +61,16 @@ def miller_rabin_test(number):
 
 
 def is_prime(number):
+    """
+    This function tests for the primality of a number using the Miller-Rabin test. The target number is
+    firstly tested against a couple of low primes. The reason behind this resides in the low performance
+    and precision of the Miler-Rabin test if the target number can be factorized using at least one low prime.
+
+    :param number: the number to be introduced in the primality test
+    :type number: int
+    :return: True if the number is prime according to the Miller-Rabin test; False, otherwise
+    :rtype: bool
+    """
     if number < 2:
         return False
     for prime in low_primes:

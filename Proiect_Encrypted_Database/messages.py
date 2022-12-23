@@ -1,3 +1,9 @@
+"""
+This module contains some success/error messages for the situations which were identified as
+possible and frequent usability routines, depending on the user's inputs.
+"""
+
+
 Success = "Operation succeeded"
 FileNotFound = "Error: Requested file does not exist or you do not have privilege to read from or write in it..."
 FileFormat = "Error: Requested file does not have appropriate format to perform requested operations on it..."

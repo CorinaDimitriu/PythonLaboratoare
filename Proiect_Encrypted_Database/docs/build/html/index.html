@@ -1,0 +1,1620 @@
+
+<!DOCTYPE html>
+
+<html lang="en'">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Welcome to EncryptedDB&#39;s documentation! &#8212; EncryptedDB 1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="welcome-to-encrypteddb-s-documentation">
+<h1>Welcome to EncryptedDB's documentation!<a class="headerlink" href="#welcome-to-encrypteddb-s-documentation" title="Permalink to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+<section id="module-main">
+<span id="modules-and-functions"></span><h1>Modules and functions<a class="headerlink" href="#module-main" title="Permalink to this heading">¶</a></h1>
+<p>This module is considered the application interface with the user.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="main.create_keys">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">create_keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.create_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function replaces the old RSA keys with new ones, for security or maintenance reasons.
+This function must be run when starting the application for the first time (no RSA parameters have been created
+before in this case) or if any external changes have occurred to the files which store them (the files
+being located in the Keys directory).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.create_workspace">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">create_workspace</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.create_workspace" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function (re)creates the application's table inside database.
+Using this function is recommended when targeting to clean the table's records
+and (re)create the FILES as an empty table.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.crypto">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">crypto</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">private_key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#main.crypto" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function captures the interaction between the user and the application.
+This might be considered the top layer which encapsulates accessing the database, parsing the user's
+commands and responding to them and all the cryptographic operations performed in the layers below.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>private_key</strong> (<em>int</em>) -- the private (fixed) key derived from computing rsa parameters; keys can be changed
+from this module as well, so their 'time to leave' is decided by the user</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.display_menu">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">display_menu</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.display_menu" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function displays the possible commands a user can issue and their corresponding formatting rules.
+The commands' menu is printed on screen every time the user has to input a new command. This way all the rules
+he has to follow are displayed right in front of him at the time he needs to compose his command.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="main.extract_keys">
+<span class="sig-prename descclassname"><span class="pre">main.</span></span><span class="sig-name descname"><span class="pre">extract_keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#main.extract_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function aims to extract the RSA keys from the local files where they are stored.
+The keys are stored in hexadecimal format. When extracted, they are also converted to big integers.
+If the user decides so, keys can be (re)generated, which causes the corresponding files to be overwritten.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the RSA private key</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-aes128"></span><p>This module performs AES-128 symmetric encryption.
+Plaintext, ciphertext and keys are considered to be in hexadecimal</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.add_one">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">add_one</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">counter</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.add_one" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function performs adding one operation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>counter</strong> (<em>str</em>) -- the counter used by the CTR iteration mode</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">counter</span> <span class="pre">+</span> <span class="pre">1</span></code> (in hexa)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.add_round_key">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">add_round_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.add_round_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>The addition of round constants.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state_matrix</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>str</em><em>]</em><em>]</em>) -- the block's state matrix</p></li>
+<li><p><strong>key</strong> (<em>str</em>) -- the round key</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the new state of the block matrix</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[list[str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.apply_decryption_round_transformation">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">apply_decryption_round_transformation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">round_no</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.apply_decryption_round_transformation" title="Permalink to this definition">¶</a></dt>
+<dd><p>The customized succession of operations for decryption. Encryption operations are
+performed in reverse order (first comes the addition of round constants etc.)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state_matrix</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>str</em><em>]</em><em>]</em>) -- the state matrix of the block being decrypted</p></li>
+<li><p><strong>key</strong> (<em>str</em>) -- the round key</p></li>
+<li><p><strong>round_no</strong> (<em>int</em>) -- the round's index</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the new state of the block matrix after performing the required operations</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[list[str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.apply_main_transformations">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">apply_main_transformations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plaintext_block</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">round_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_block</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'encrypt'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.apply_main_transformations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies the transformation per 128-bits (or less) block, known as:
+substitution bytes, shift rows, mix columns and addition of round constants.
+There are 10 rounds, preceded by an initial addition of round constant. The last
+round lacks the mix columns operation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>plaintext_block</strong> (<em>str</em>) -- the target block (derived from the counter)</p></li>
+<li><p><strong>round_keys</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) -- the round keys previously returned by the key scheduling algorithm</p></li>
+<li><p><strong>original_block</strong> (<em>str</em>) -- the initial text (provided that CTR operation mode is used)</p></li>
+<li><p><strong>mode</strong> (<em>str</em>) -- indicates whether transformations are performed during encryption or decryption.
+It has 2 possible values, namely encrypt and decrypt, first one being the default value</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the encrypted/decrypted block</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.apply_round_transformation">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">apply_round_transformation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">round_no</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.apply_round_transformation" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function performs the round transformations on specified block. The block is kept as
+4x4 state matrix. The same matrix is changed during each round.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state_matrix</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>str</em><em>]</em><em>]</em>) -- the state matrix</p></li>
+<li><p><strong>key</strong> (<em>str</em>) -- the round key</p></li>
+<li><p><strong>round_no</strong> (<em>int</em>) -- the index of the round</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the new state of the block matrix</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[list[str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.compute_round_key">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">compute_round_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ante_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_round</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.compute_round_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes one round key. There are 10 rounds in the key scheduling algorithm and
+this function contains repetitive steps that apply for each of them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ante_key</strong> (<em>str</em>) -- the key generated at the previous round (round 0 is the base round)</p></li>
+<li><p><strong>key_round</strong> (<em>int</em>) -- the index of the current round</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the generated round key</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.convert_text_into_matrix">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">convert_text_into_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.convert_text_into_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Hexadecimal string is converted into 4x4 matrix. The matrix takes two hexa units for each
+of its elements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>block</strong> (<em>str</em>) -- the 32 hexadecimal units block</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the (transposed) matrix derived from the block</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[list[str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.decrypt_aes128">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">decrypt_aes128</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">counter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ciphertext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.decrypt_aes128" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>This function performs AES-128 decryption in CTR mode. The operations being performed are:</dt><dd><ul class="simple">
+<li><p>key generation</p></li>
+<li><p>key scheduling =&gt; round keys</p></li>
+<li><p>counter(s) generation</p></li>
+<li><p>encrypting counters in AES-128 CBC mode for single words</p></li>
+<li><p>xoring counters with the blocks of ciphertext provided through parameter</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ciphertext</strong> (<em>str</em>) -- encrypted data</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>original data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.divide_ciphertext">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">divide_ciphertext</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ciphertext</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.divide_ciphertext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plaintext is divided into blocks of 128 bits each. Last block might contain less than 128 bits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ciphertext</strong> (<em>str</em>) -- the encrypted message (which is about to be decrypted)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.divide_plaintext">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">divide_plaintext</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plaintext</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.divide_plaintext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plaintext is divided into blocks of 128 bits each. Last block might contain less than 128 bits.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>plaintext</strong> (<em>str</em>) -- the original message (the one which is being symmetrically encrypted)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.encrypt_aes128">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">encrypt_aes128</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plaintext</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.encrypt_aes128" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>This function performs AES-128 encryption in CTR mode. The operations being performed are:</dt><dd><ul class="simple">
+<li><p>key generation</p></li>
+<li><p>key scheduling =&gt; round keys</p></li>
+<li><p>counter(s) generation</p></li>
+<li><p>encrypting counters in AES-128 CBC mode for single words</p></li>
+<li><p>xoring counters with the original blocks of plaintext</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>plaintext</strong> (<em>str</em>) -- the data to be encrypted</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>encrypted data</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.generate_128bits_random">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">generate_128bits_random</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#aes128.generate_128bits_random" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exactly 128-bits random generation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>exactly 128-bits random, converted into hexa string</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.get_ciphertext">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">get_ciphertext</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transposed_final_matrix</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.get_ciphertext" title="Permalink to this definition">¶</a></dt>
+<dd><p>AES 4x4 matrix is converted back to hexadecimal string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>transposed_final_matrix</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>str</em><em>]</em><em>]</em>) -- the matrix to be converted</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the (transposed) matrix as hexadecimal string</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.key_schedule">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">key_schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.key_schedule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implementation of the key scheduling algorithm from the AES-128 standard.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>key</strong> (<em>str</em>) -- the base key</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>all 11 round keys, the first one being the base key</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.mix_columns">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">mix_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.mix_columns" title="Permalink to this definition">¶</a></dt>
+<dd><p>The addition of round constants.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state_matrix</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>str</em><em>]</em><em>]</em>) -- the block's state matrix</p></li>
+<li><p><strong>mode</strong> (<em>str</em>) -- standard or inverse (every word but standard will be perceived as inverse)
+The fixed matrix required at this step, which is constant, depends on the operation performed
+(encryption or decryption)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the new state of the block matrix</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[list[str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.multiply_by_02">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">multiply_by_02</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.multiply_by_02" title="Permalink to this definition">¶</a></dt>
+<dd><p>Special multiplication by <code class="docutils literal notranslate"><span class="pre">02</span></code> in <code class="docutils literal notranslate"><span class="pre">GF(pow(2,</span> <span class="pre">8))</span></code> function.
+The input and output are still hexa strings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>x</strong> (<em>str</em>) -- the number aimed to be multiplied by <code class="docutils literal notranslate"><span class="pre">02</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the result of the multiplication operation</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.multiply_matrices">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">multiply_matrices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">static_m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamic_m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.multiply_matrices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multiplication of hexa matrices required at the mix columns operation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>static_m</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>str</em><em>]</em><em>]</em>) -- the fixed matrix</p></li>
+<li><p><strong>dynamic_m</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>str</em><em>]</em><em>]</em>) -- the state matrix</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the result matrix</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[list[str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.multiply_stream">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">multiply_stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.multiply_stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is built with the purpose of multiplying two hexa strings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> (<em>str</em>) -- the first hexa string</p></li>
+<li><p><strong>y</strong> (<em>str</em>) -- the second hexa string
+It only takes values from {01, 02, 03, 09, 0B, 0D, 0E},
+due to the structure of the fixed matrix used at the mix columns operation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the result as hexa string</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.pad_with_zeros">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">pad_with_zeros</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.pad_with_zeros" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function aims to add additional zeros to the blocks which are less
+than 128 bits in length. Due to the fact that blocks are encoded in base16, the required length
+becomes 32 hexadecimal units.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>block</strong> (<em>str</em>) -- the block to be padded</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the padded block</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.parallelize_ctr">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">parallelize_ctr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">counters</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">round_keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'encrypt'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.parallelize_ctr" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function implements the CTR mode for a set of counters through parallelization
+of the encryption required for each of them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>counters</strong> -- list[str]</p></li>
+<li><p><strong>round_keys</strong> -- list[str]</p></li>
+<li><p><strong>mode</strong> -- encrypt or decrypt depending on the operation performed on the text blocks</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.s_box_transformation">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">s_box_transformation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pair</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.s_box_transformation" title="Permalink to this definition">¶</a></dt>
+<dd><p>The s-box atomic substitution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pair</strong> (<em>(</em><em>str</em><em>, </em><em>str</em><em>)</em>) -- a pair of two hexa units identifying the row and column in the (inverse) s-box matrix</p></li>
+<li><p><strong>mode</strong> (<em>str</em>) -- standard or inverse (every word but standard will be perceived as inverse)
+The mode corresponds to the operation performed (encryption or decryption)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the element located at the intersection of row pair[0] and column pair[1]</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.shift_rows">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">shift_rows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift_per_column</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.shift_rows" title="Permalink to this definition">¶</a></dt>
+<dd><p>The rows shifting operation. Rows are left shifted with number of elements
+provided by <em>shift_per_column</em> depending on the row index.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state_matrix</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>str</em><em>]</em><em>]</em>) -- the block's state matrix</p></li>
+<li><p><strong>shift_per_column</strong> (<em>list</em><em>[</em><em>int</em><em>]</em>) -- the number of elements which have to be shifted for each row (index)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the new state of the block matrix</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[list[str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.substitution_bytes">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">substitution_bytes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.substitution_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>The bytes substitution operation. The hexadecimal units are replaced with
+combinations provided by the special s-box matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state_matrix</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>str</em><em>]</em><em>]</em>) -- the block's state matrix</p></li>
+<li><p><strong>mode</strong> (<em>str</em>) -- standard or inverse (every word but standard will be perceived as inverse)
+There are different s-box matrices depending on the nature of the operation (encryption or decryption)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the new state of the block matrix</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[list[str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.xor_matrix">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">xor_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.xor_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is built with the purpose of xoring two 4x4 hexa matrices.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>str</em><em>]</em><em>]</em>) -- the first matrix</p></li>
+<li><p><strong>key</strong> (<em>list</em><em>[</em><em>list</em><em>[</em><em>str</em><em>]</em><em>]</em>) -- the second matrix</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the result as 4x4 hexa matrix</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[list[str]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="aes128.xor_stream">
+<span class="sig-prename descclassname"><span class="pre">aes128.</span></span><span class="sig-name descname"><span class="pre">xor_stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rcon</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#aes128.xor_stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function is built with the purpose of xoring two hexa strings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>) -- the first hexa string</p></li>
+<li><p><strong>rcon</strong> (<em>str</em>) -- the second hexa string</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the result as hexa string</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-rsa_oaep"></span><p>This module works with integers and implements the RSA-OAEP scheme.
+OAEP is the padding method being used.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="rsa_oaep.compute_parameters">
+<span class="sig-prename descclassname"><span class="pre">rsa_oaep.</span></span><span class="sig-name descname"><span class="pre">compute_parameters</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#rsa_oaep.compute_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function uses lower layers such as <em>rsa_generator</em> and <em>miller_rabin</em> in order to
+generate large RSA keys. The size of <code class="docutils literal notranslate"><span class="pre">p</span></code> and <code class="docutils literal notranslate"><span class="pre">q</span></code> is established inside this function, so is <code class="docutils literal notranslate"><span class="pre">e</span></code> from
+the public key. There is a code block which enforces that e and (p-1), (q-1) are relatively prime to each other.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the pair consisting of one public and one private generated key</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int, int)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rsa_oaep.decrypt_rsa">
+<span class="sig-prename descclassname"><span class="pre">rsa_oaep.</span></span><span class="sig-name descname"><span class="pre">decrypt_rsa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ciphertext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">private_key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rsa_oaep.decrypt_rsa" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements the classic RSA decryption step, by raising the ciphertext (as integer) to the power of <code class="docutils literal notranslate"><span class="pre">d</span></code> from
+the private key. It is known that <code class="docutils literal notranslate"><span class="pre">d</span></code> from private key is the modular inverse of <code class="docutils literal notranslate"><span class="pre">e</span></code> from public key
+(modulo <code class="docutils literal notranslate"><span class="pre">(p-1)</span> <span class="pre">*</span> <span class="pre">(q-1)</span></code>, which makes d hard to guess), making the whole process result into
+the initial plaintext.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ciphertext</strong> (<em>str</em>) -- the encrypted information which is to be decrypted</p></li>
+<li><p><strong>private_key</strong> (<em>(</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>)</em>) -- the private key which serves for decryption</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>initial data being decrypted</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rsa_oaep.decrypt_rsa_oaep">
+<span class="sig-prename descclassname"><span class="pre">rsa_oaep.</span></span><span class="sig-name descname"><span class="pre">decrypt_rsa_oaep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ciphertext</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">private_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_len</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rsa_oaep.decrypt_rsa_oaep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implementation of the RSA-OAEP decryption step. First RSA decryption on the ciphertext is performed,
+followed by OAEP decoding.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ciphertext</strong> (<em>int</em>) -- the encrypted information which is to be decrypted</p></li>
+<li><p><strong>private_key</strong> (<em>(</em><em>int</em><em>, </em><em>int</em><em>, </em><em>int</em><em>)</em>) -- the private key which serves for decryption</p></li>
+<li><p><strong>expected_len</strong> -- the expected length of the result (this influences the internal</p></li>
+</ul>
+</dd>
+</dl>
+<p>transformations made by the algorithm and, therefore, the overall result)
+:type expected_len: int
+:return: initial data being decrypted
+:rtype: int</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rsa_oaep.encrypt_rsa">
+<span class="sig-prename descclassname"><span class="pre">rsa_oaep.</span></span><span class="sig-name descname"><span class="pre">encrypt_rsa</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plaintext</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rsa_oaep.encrypt_rsa" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements the classic RSA encryption step, by raising the plaintext (as integer) to the power of <code class="docutils literal notranslate"><span class="pre">e</span></code> from
+the public key.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>plaintext</strong> (<em>int</em>) -- the information to be encrypted</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the result of the encryption operation described above as an exponentiation</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rsa_oaep.encrypt_rsa_oaep">
+<span class="sig-prename descclassname"><span class="pre">rsa_oaep.</span></span><span class="sig-name descname"><span class="pre">encrypt_rsa_oaep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plaintext</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rsa_oaep.encrypt_rsa_oaep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implementation of the RSA-OAEP encryption step. First OAEP padding is performed,
+followed by RSA encryption on the padded plaintext.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>plaintext</strong> (<em>int</em>) -- the information to be encrypted</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the result of the encryption operation described above</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rsa_oaep.oaep_padding_decode">
+<span class="sig-prename descclassname"><span class="pre">rsa_oaep.</span></span><span class="sig-name descname"><span class="pre">oaep_padding_decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cipher</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message_len</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zeros</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rand_bits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rsa_oaep.oaep_padding_decode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implementation of the encoding step of the OAEP padding scheme. Some additional information
+such as the initial message's length is required.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>cipher</strong> (<em>int</em>) -- the data being subject to decoding</p></li>
+<li><p><strong>message_len</strong> (<em>int</em>) -- the length of the initial message (the one which was encoded)</p></li>
+<li><p><strong>zeros</strong> (<em>int</em>) -- the number of zero bits which were added at the end of the initial message
+during encoding (established by the protocol)</p></li>
+<li><p><strong>rand_bits</strong> (<em>int</em>) -- the number of random bits contained by the seed (established by the protocol)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>not anymore padded message</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rsa_oaep.oaep_padding_encode">
+<span class="sig-prename descclassname"><span class="pre">rsa_oaep.</span></span><span class="sig-name descname"><span class="pre">oaep_padding_encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">zeros</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rand_bits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rsa_oaep.oaep_padding_encode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implementation of the encoding step of the OAEP padding scheme.
+The message is randomized before encryption in order
+to force the encryption method <strong>not</strong> to be deterministic.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<em>int</em>) -- the message to be padded (before encryption)</p></li>
+<li><p><strong>zeros</strong> (<em>int</em>) -- the number of zero bits being added at the end of <em>message</em></p></li>
+<li><p><strong>rand_bits</strong> -- the number of random bits contained by the seed</p></li>
+</ul>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the padded version of the message, consisting of two bit
+subsequences, which are individually converted to integers</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>(int, int)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-rsa_generator"></span><p>This module generates rsa primes.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="rsa_generator.gen_rsa_prime_parameters">
+<span class="sig-prename descclassname"><span class="pre">rsa_generator.</span></span><span class="sig-name descname"><span class="pre">gen_rsa_prime_parameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rsa_generator.gen_rsa_prime_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates rsa prime parameters widely known as p and q, of size given as parameter.
+<code class="docutils literal notranslate"><span class="pre">p</span></code> and <code class="docutils literal notranslate"><span class="pre">q</span></code> are prime numbers tested 10 times against the Miller-Rabin test.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>size</strong> (<em>int</em>) -- the desired length (same length, in bits) of <code class="docutils literal notranslate"><span class="pre">p</span></code> and <code class="docutils literal notranslate"><span class="pre">q</span></code></p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">p</span></code> and <code class="docutils literal notranslate"><span class="pre">q</span></code></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="rsa_generator.generate_prime">
+<span class="sig-prename descclassname"><span class="pre">rsa_generator.</span></span><span class="sig-name descname"><span class="pre">generate_prime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#rsa_generator.generate_prime" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Generates prime number of exactly <strong>size</strong> bits. The primality is checked using the Miler-Rabin probabilistic</dt><dd><p>primality test.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>size</strong> (<em>int</em>) -- the size of the prime which is about to be generated (in bits)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the first generated prime number which passed the primality test</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-messages"></span><p>This module contains some success/error messages for the situations which were identified as
+possible and frequent usability routines, depending on the user's inputs.</p>
+<span class="target" id="module-sha256"></span><dl class="py function">
+<dt class="sig sig-object py" id="sha256.add_length">
+<span class="sig-prename descclassname"><span class="pre">sha256.</span></span><span class="sig-name descname"><span class="pre">add_length</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sha256.add_length" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function replaces the last 64 bytes of the plaintext with the length
+of the initial message in binary form.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sha256.add_one">
+<span class="sig-prename descclassname"><span class="pre">sha256.</span></span><span class="sig-name descname"><span class="pre">add_one</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sha256.add_one" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function adds a bit set on 1 at the end of the message/plaintext.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sha256.addition">
+<span class="sig-prename descclassname"><span class="pre">sha256.</span></span><span class="sig-name descname"><span class="pre">addition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bytes2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sha256.addition" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function performs addition between two octet strings. The octet strings are firstly
+converted to integers, so that modulo <code class="docutils literal notranslate"><span class="pre">pow(2,</span> <span class="pre">32)</span></code> addition can be performed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bytes1</strong> (<em>str</em>) -- the first octet bit</p></li>
+<li><p><strong>bytes2</strong> (<em>str</em>) -- the second octet bit</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the result of the addition operation</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sha256.and_operation">
+<span class="sig-prename descclassname"><span class="pre">sha256.</span></span><span class="sig-name descname"><span class="pre">and_operation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bytes2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sha256.and_operation" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function performs <em>and</em> operation between two octet strings. The octet strings are firstly
+converted to integers and additional bytes are added if necessary to obtain a complete 32-bit block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bytes1</strong> (<em>str</em>) -- the first octet bit</p></li>
+<li><p><strong>bytes2</strong> (<em>str</em>) -- the second octet bit</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the result as octet string</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sha256.apply_main_block_transformation">
+<span class="sig-prename descclassname"><span class="pre">sha256.</span></span><span class="sig-name descname"><span class="pre">apply_main_block_transformation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">plain_block</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sha256.apply_main_block_transformation" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function iterates through all the steps required for binary blocks in order to update
+hashes at the end of each round of transformations per block.
+Essentially, the so-mentioned transformations involve performing message scheduling and compression.
+Plaintext is split into 16 32-bit blocks, which are added 48 brand new 32-bit on 0 blocks. For each
+32-bit block, compression is performed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>plain_block</strong> (<em>str</em>) -- the binary string block to perform transformations on</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sha256.apply_main_transformations">
+<span class="sig-prename descclassname"><span class="pre">sha256.</span></span><span class="sig-name descname"><span class="pre">apply_main_transformations</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sha256.apply_main_transformations" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function iterates through the 512-bit blocks and updates the hashes.
+Eventually, it computes the digest after the last block has passed through
+all the required transformations.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sha256.compression">
+<span class="sig-prename descclassname"><span class="pre">sha256.</span></span><span class="sig-name descname"><span class="pre">compression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_hashes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sha256.compression" title="Permalink to this definition">¶</a></dt>
+<dd><p>The compression function mixes the hashes from the previous round of transformations per block
+by performing right rotations, &amp;-operations, not-operations, switching and additions on them.
+The 32-bit plaintext block prove their utility during additions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bytes32</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) -- the current 32-bit block</p></li>
+<li><p><strong>counter</strong> (<em>str</em>) -- the index of the block</p></li>
+<li><p><strong>copy_hashes</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) -- the current version of the hashes</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the updated version of the hashes</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sha256.compute_digest">
+<span class="sig-prename descclassname"><span class="pre">sha256.</span></span><span class="sig-name descname"><span class="pre">compute_digest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particular_hashes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sha256.compute_digest" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function joins all hashes into an octet string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>particular_hashes</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) -- the final version of the hashes</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the digest derived from concatenating all the hashes (which are, in fact, octet strings)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sha256.convert_hashes_to_binary">
+<span class="sig-prename descclassname"><span class="pre">sha256.</span></span><span class="sig-name descname"><span class="pre">convert_hashes_to_binary</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sha256.convert_hashes_to_binary" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function converts integers to octet strings.
+The target integers are the hashes required by the digest computing algorithm.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sha256.create_hashes">
+<span class="sig-prename descclassname"><span class="pre">sha256.</span></span><span class="sig-name descname"><span class="pre">create_hashes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sha256.create_hashes" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function ensures that, at the beginning of each round of transformations per block,
+the operations start with the updated version of the hashes, which was obtained during
+the computations made for the previous message block.
+:return: the last version of the hashes list
+:rtype: list[str]</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sha256.create_message_schedule">
+<span class="sig-prename descclassname"><span class="pre">sha256.</span></span><span class="sig-name descname"><span class="pre">create_message_schedule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_array32</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sha256.create_message_schedule" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function updates the last 48 32-bit blocks of the plaintext by combining
+right rotations, right shifts and additions on the previous blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>bytes_array32</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) -- the plaintext split into 32-bit blocks</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the updated plaintext as an 32-bit octet strings list</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list[str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sha256.execute_sha256">
+<span class="sig-prename descclassname"><span class="pre">sha256.</span></span><span class="sig-name descname"><span class="pre">execute_sha256</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_plaintext</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sha256.execute_sha256" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function concatenates all the necessary steps for computing sha-256 binary digest.
+Details about pre-processing, 512-bit and 32-bit (<em>atomic</em>) block transformations are listed
+inside the description of the corresponding functions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>user_plaintext</strong> (<em>str</em>) -- the plaintext on which digest is aimed to be computed</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the hash digest</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sha256.initialize_sha256">
+<span class="sig-prename descclassname"><span class="pre">sha256.</span></span><span class="sig-name descname"><span class="pre">initialize_sha256</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sha256.initialize_sha256" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>This function initializes the hashes list which will be used during sha-256</dt><dd><p>digest computing and converts all 8 of them to binary format.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sha256.modify_hashes_within_chunk_loop">
+<span class="sig-prename descclassname"><span class="pre">sha256.</span></span><span class="sig-name descname"><span class="pre">modify_hashes_within_chunk_loop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particular_hashes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sha256.modify_hashes_within_chunk_loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function performs addition between the last version of the hashes
+(last updated at the end of the previous round of transformations per block)
+and the last version of the particularly updated hashes during the transformations
+performed on the current block.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>particular_hashes</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) -- the last version of the hashes
+(last updated at the end of the previous round of transformations per block)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sha256.not_operation">
+<span class="sig-prename descclassname"><span class="pre">sha256.</span></span><span class="sig-name descname"><span class="pre">not_operation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes_only</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sha256.not_operation" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function operates on a bit block and negates it, by reversing all its bits.
+More precisely, the length stays the same, all the 0's become 1's and all the 1's become 0's.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>bytes_only</strong> (<em>str</em>) -- the bit block to perform negation on</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the negated bit block</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sha256.padding_until_512_less64">
+<span class="sig-prename descclassname"><span class="pre">sha256.</span></span><span class="sig-name descname"><span class="pre">padding_until_512_less64</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sha256.padding_until_512_less64" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function pads the plaintext with 0’s until data is a multiple of 512, less 64 bits (448 bits).</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sha256.pre_processing">
+<span class="sig-prename descclassname"><span class="pre">sha256.</span></span><span class="sig-name descname"><span class="pre">pre_processing</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sha256.pre_processing" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function encapsulates the pre-processing operations performed on the plaintext before
+actually computing the hash digest: adding a one bit, padding with 0's and adding the length at the end.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sha256.right_rotate">
+<span class="sig-prename descclassname"><span class="pre">sha256.</span></span><span class="sig-name descname"><span class="pre">right_rotate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sha256.right_rotate" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function moves to the end a couple of bits located at the beginning of the octet string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>) -- the octet string on which the rotation is performed</p></li>
+<li><p><strong>bits</strong> (<em>int</em>) -- the number of bits being moved</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the updated octet string</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sha256.right_shift">
+<span class="sig-prename descclassname"><span class="pre">sha256.</span></span><span class="sig-name descname"><span class="pre">right_shift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bits</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sha256.right_shift" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function performs right-shifting with a number of bits on <em>text</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>str</em>) -- the octet string on which the shifting is performed</p></li>
+<li><p><strong>bits</strong> (<em>int</em>) -- the number of bits being shifted</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the updated octet string</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sha256.split_plaintext_into_blocks">
+<span class="sig-prename descclassname"><span class="pre">sha256.</span></span><span class="sig-name descname"><span class="pre">split_plaintext_into_blocks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#sha256.split_plaintext_into_blocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function splits the plaintext into 512-bits blocks.
+The blocks are encoded as octet strings.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="sha256.xor">
+<span class="sig-prename descclassname"><span class="pre">sha256.</span></span><span class="sig-name descname"><span class="pre">xor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bytes1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bytes2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sha256.xor" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function performs xor (particular binary addition) between two octet strings.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bytes1</strong> (<em>str</em>) -- the first octet bit to be xored</p></li>
+<li><p><strong>bytes2</strong> (<em>str</em>) -- the second octet bit to be xored</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the result of the xor operation</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-mgf1"></span><p># This module works with binary representations of numbers and outputs masks of given size starting from given seed.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="mgf1.mgf">
+<span class="sig-prename descclassname"><span class="pre">mgf1.</span></span><span class="sig-name descname"><span class="pre">mgf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mgf1.mgf" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is a mask generation function (mgf) based on sha-256 hash function.
+Essentially, the seed is given to the hash function. This operation repeats
+multiple times, while a counter is increasing at every step in order to be concatenated
+to the seed before hashing. It is well known that slightly different messages usually
+produce totally different hashes, so the counter is used to <em>randomize</em> the seed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mask_length</strong> (<em>int</em>) -- the desired length of the mask (usually the mask is going to be
+xored with some other cryptographic input, so the two must be equally large)</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) -- random number given to the hash function</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>generated mask of exactly mask_length bits, starting from given seed, as octet string</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>TypeError</strong> -- when the seed is not of integer type</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-commands"></span><dl class="py function">
+<dt class="sig sig-object py" id="commands.connect_to_database">
+<span class="sig-prename descclassname"><span class="pre">commands.</span></span><span class="sig-name descname"><span class="pre">connect_to_database</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#commands.connect_to_database" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function facilitates connecting the application module to the database in
+order to perform insertions, retrievals and deletions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the connection being opened</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>pyodbc.Connection</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="commands.create_files_table">
+<span class="sig-prename descclassname"><span class="pre">commands.</span></span><span class="sig-name descname"><span class="pre">create_files_table</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#commands.create_files_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function (re)creates the FILES table in order to keep metadata
+and cryptographic information about the target files.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="commands.delete_file">
+<span class="sig-prename descclassname"><span class="pre">commands.</span></span><span class="sig-name descname"><span class="pre">delete_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commands.delete_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is where the delete command is being executed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) -- the name of the target file</p></li>
+<li><p><strong>path</strong> (<em>str</em>) -- the path where the target file is located</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>success or error message, depending on the use-cases encountered</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>AttributeError</strong> -- if none of the 2 possible identifiers
+of the file has been specified by the user or if targeted file
+does not exist within the database (and neither do its identifiers)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="commands.get_metadata">
+<span class="sig-prename descclassname"><span class="pre">commands.</span></span><span class="sig-name descname"><span class="pre">get_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commands.get_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function gathers metadata about the file located at <em>file_path</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) -- the path of the target file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the essential metadata of the target file</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str, str, int, bool, bool, int, int, str, bool)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="commands.insert_all_data">
+<span class="sig-prename descclassname"><span class="pre">commands.</span></span><span class="sig-name descname"><span class="pre">insert_all_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encrypted_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commands.insert_all_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is where the database operations regarding the upload command are performed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) -- the unique identifier wished by the user</p></li>
+<li><p><strong>file_path</strong> (<em>str</em>) -- the path to the target file</p></li>
+<li><p><strong>encrypted_key</strong> (<em>str</em>) -- the RSA-encrypted symmetric key used for file encryption</p></li>
+<li><p><strong>metadata</strong> (<em>(</em><em>str</em><em>, </em><em>str</em><em>, </em><em>int</em><em>, </em><em>bool</em><em>, </em><em>bool</em><em>, </em><em>int</em><em>, </em><em>int</em><em>, </em><em>str</em><em>, </em><em>bool</em><em>)</em>) -- metadata about the target file; includes:
+absolute path,
+base file name,
+size,
+if read operations are permitted,
+if write operations are permitted,
+owner id,
+group id,
+hash digest of the file,
+if the file has been deleted from disk (but the encryption is kept),</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="commands.insert_encrypted_file">
+<span class="sig-prename descclassname"><span class="pre">commands.</span></span><span class="sig-name descname"><span class="pre">insert_encrypted_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commands.insert_encrypted_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is where the upload command is being executed. The file located at <em>file_path</em>,
+along with its metadata, is inserted into the database and will be further identified under <em>name</em>.
+Multiple file formats have been treated (.txt, .docx, .pdf).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file_path</strong> (<em>str</em>) -- the path to the target file</p></li>
+<li><p><strong>name</strong> (<em>str</em>) -- the file identifier</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>success or error message, depending on the use-cases encountered</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="commands.retrieve_decrypted_file">
+<span class="sig-prename descclassname"><span class="pre">commands.</span></span><span class="sig-name descname"><span class="pre">retrieve_decrypted_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">private_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commands.retrieve_decrypted_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is where the read command is being executed. The content of the target file is
+displayed to the user. The content of the file is decrypted using the asymmetric key stored
+within the database. Multiple file formats have been treated (.txt, .docx, .pdf).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>private_key</strong> (<em>int</em>) -- the private RSA key for decrypting the asymmetric key
+stored within the FILES table</p></li>
+<li><p><strong>name</strong> (<em>str</em>) -- the unique identifier of the target file (optional)</p></li>
+<li><p><strong>path</strong> (<em>str</em>) -- the path to the target file (optional)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the content of the target file (as plaintext) or an error message if
+exceptions have occurred at the retrieval operation</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>AttributeError</strong> -- if none of the 2 possible identifiers
+of the file has been specified by the user</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="commands.retrieve_from_database">
+<span class="sig-prename descclassname"><span class="pre">commands.</span></span><span class="sig-name descname"><span class="pre">retrieve_from_database</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commands.retrieve_from_database" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is where the database operations regarding the read command are performed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) -- the name of the target file</p></li>
+<li><p><strong>path</strong> (<em>str</em>) -- the path where the target file is located</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the name, path (updated if not specified from the very beginning)
+and the encrypted symmetric key which was used at file encryption</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(str, str, int)</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>AttributeError</strong> -- if targeted file does not exist within the database
+(and neither do its identifiers)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="commands.solve_command">
+<span class="sig-prename descclassname"><span class="pre">commands.</span></span><span class="sig-name descname"><span class="pre">solve_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request_code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">private_key</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#commands.solve_command" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function implements command solving as far as user's inputs are concerned. After passing
+through a pre-processing step and acquiring the green flag for validation, the command is split into
+a request code and its actual parameters (tags for identifying parameters such as <strong>-n</strong> or <strong>-p</strong> are
+eliminated during pre-processing the input). The request code corresponds to one of the following operations:
+0 ~ upload; 1 ~ read; 2 ~ delete; 3 ~ exit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request_code</strong> (<em>int</em>) -- an integer (from [0-3]) identifying the requested operation</p></li>
+<li><p><strong>params</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) -- the actual parameters of the request, regarding the file (name and path)</p></li>
+<li><p><strong>private_key</strong> (<em>int</em>) -- the private RSA key serving for decryption of the symmetric key
+used in AES-128</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the result of the operation (file content or specific messages)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-command_parser"></span><p>This module validates commands and separates them into request and request parameters
+starting from the user keyboard input.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="command_parser.delete_retrieve_validate">
+<span class="sig-prename descclassname"><span class="pre">command_parser.</span></span><span class="sig-name descname"><span class="pre">delete_retrieve_validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#command_parser.delete_retrieve_validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validates the read/delete parameters issued by user in the second part of his query.
+At least one of name and path must be specified.
+The user can specify both but in this case only name will be taken into account.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) -- the raw parameter string issued by the user</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the validation tuple made up of the OK code and the actual parameters' list</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(bool, list[str])</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="command_parser.exit_validate">
+<span class="sig-prename descclassname"><span class="pre">command_parser.</span></span><span class="sig-name descname"><span class="pre">exit_validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#command_parser.exit_validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validates the exit command which should consist of a single word and no parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) -- the raw parameter string issued by the user</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the validation tuple made up of the OK code and the actual parameters' list</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(bool, list[str])</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="command_parser.parse">
+<span class="sig-prename descclassname"><span class="pre">command_parser.</span></span><span class="sig-name descname"><span class="pre">parse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#command_parser.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>It is designed to classify commands by assigning a request code and extract the necessary parameters from
+them. Some pre-established syntax rules are checked during the execution of this function, such as the number
+of parameters issued by the user and the existence of the mandatory ones within them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>command</strong> (<em>str</em>) -- the command issued by the user</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a tuple made up of 3 elements, from which the first one indicates the success/failure
+of the parsing operation which was attempted, the second one represents the request code and the third one is
+a list of the actual parameters of the request. The request code has 4 possible values, which correspond
+to the 4 basic operations which the user can execute: upload, read, delete file and exit.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(bool, int, list[str])</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="command_parser.upload_validate">
+<span class="sig-prename descclassname"><span class="pre">command_parser.</span></span><span class="sig-name descname"><span class="pre">upload_validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#command_parser.upload_validate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validates the upload parameters issued by user in the second part of his query.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) -- the raw parameter string issued by the user</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the validation tuple made up of the OK code and the actual parameters' list</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(bool, list[str])</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="command_parser.validate_command">
+<span class="sig-prename descclassname"><span class="pre">command_parser.</span></span><span class="sig-name descname"><span class="pre">validate_command</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request_code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#command_parser.validate_command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits validation into particular cases depending on the command type/request code the user issued.
+Significance of codes: 0 ~ upload; 1 ~ read; 2 ~ delete; 3 ~ exit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>request_code</strong> (<em>int</em>) -- the request code deduced according to the above signification</p></li>
+<li><p><strong>params</strong> (<em>list</em><em>[</em><em>str</em><em>]</em>) -- the raw parameter string issued by the user; includes specifications such as
+<code class="docutils literal notranslate"><span class="pre">-n</span></code> or <code class="docutils literal notranslate"><span class="pre">-p</span></code> which are meant to be eliminated after parsing</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the validation tuple made up of the OK code and the actual parameters' list</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>(bool, list[str])</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-reader"></span><p>This module serves for reading texts from different file formats.
+Advanced elements such as images, charts, passwords may cause unusual behaviour to the program.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="reader.docx_reader">
+<span class="sig-prename descclassname"><span class="pre">reader.</span></span><span class="sig-name descname"><span class="pre">docx_reader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#reader.docx_reader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads content of docx files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) -- the absolute/relative path to the target file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the content of the file encoded in hexadecimal format
+(preliminary utf-8 encoding is worth being mentioned as well)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reader.get_format">
+<span class="sig-prename descclassname"><span class="pre">reader.</span></span><span class="sig-name descname"><span class="pre">get_format</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#reader.get_format" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function aims to provide other services of the application with suitable
+decoding formats depending on the file type/extension on Windows OS.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) -- the absolute/relative path to the target file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>decoding character set suitable for the file</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reader.pdf_reader">
+<span class="sig-prename descclassname"><span class="pre">reader.</span></span><span class="sig-name descname"><span class="pre">pdf_reader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#reader.pdf_reader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads content of pdf files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) -- the absolute/relative path to the target file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the content of the file encoded in hexadecimal format
+(preliminary utf-8 encoding is worth being mentioned as well)</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reader.read_data">
+<span class="sig-prename descclassname"><span class="pre">reader.</span></span><span class="sig-name descname"><span class="pre">read_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#reader.read_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function aims to read the content of the specified file, taking its extension
+into consideration as a hint for its formatting type (Windows OS).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file_path</strong> (<em>str</em>) -- the absolute/relative path to the target file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the content of the file, taking the format into account while
+encoding to serve the purposes of the application; the content is represented
+in base16</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="reader.txt_reader">
+<span class="sig-prename descclassname"><span class="pre">reader.</span></span><span class="sig-name descname"><span class="pre">txt_reader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#reader.txt_reader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads content of txt files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>file</strong> -- the file descriptor</p>
+</dd>
+<dt class="field-even">Type<span class="colon">:</span></dt>
+<dd class="field-even"><p>int</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the content of the file encoded in hexadecimal format</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<span class="target" id="module-miller_rabin"></span><p>This module represents tha ambition to implement the Miller-Rabin primality test.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="miller_rabin.decompose_number">
+<span class="sig-prename descclassname"><span class="pre">miller_rabin.</span></span><span class="sig-name descname"><span class="pre">decompose_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#miller_rabin.decompose_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>In order to prepare for executing the Miller-Rabin primality test, the number
+is written as <code class="docutils literal notranslate"><span class="pre">t</span> <span class="pre">*</span> <span class="pre">pow(2,</span> <span class="pre">s)</span></code>, where s is maximized and t is odd.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>number</strong> (<em>int</em>) -- the number to decompose, on which the Miller-Rabin test is to be performed</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>s and t, the components of the number's decomposition as described</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miller_rabin.is_prime">
+<span class="sig-prename descclassname"><span class="pre">miller_rabin.</span></span><span class="sig-name descname"><span class="pre">is_prime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#miller_rabin.is_prime" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function tests for the primality of a number using the Miller-Rabin test. The target number is
+firstly tested against a couple of low primes. The reason behind this resides in the low performance
+and precision of the Miler-Rabin test if the target number can be factorized using at least one low prime.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>number</strong> (<em>int</em>) -- the number to be introduced in the primality test</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the number is prime according to the Miller-Rabin test; False, otherwise</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="miller_rabin.miller_rabin_test">
+<span class="sig-prename descclassname"><span class="pre">miller_rabin.</span></span><span class="sig-name descname"><span class="pre">miller_rabin_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#miller_rabin.miller_rabin_test" title="Permalink to this definition">¶</a></dt>
+<dd><p>The Miller-Rabin primality test implemented.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>number</strong> (<em>int</em>) -- the target number to be tested for primality</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if the number is prime according to one iteration
+of the Miller-Rabin test; False, otherwise</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading">¶</a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="#">EncryptedDB</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="#">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Corina Dimitriu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/index.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

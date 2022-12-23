@@ -48,7 +48,7 @@ r_con = ['01000000', '02000000', '04000000', '08000000', '10000000', '20000000',
          '80000000', '1B000000', '36000000']
 
 
-def divide_plaintext(plaintext):
+def divide_plaintext(plaintext: str) -> None:
     """
     Plaintext is divided into blocks of 128 bits each. Last block might contain less than 128 bits.
 
@@ -63,7 +63,7 @@ def divide_plaintext(plaintext):
     plaintext_blocks = [plaintext[i:i + 32] for i in range(0, len(plaintext), 32)]
 
 
-def divide_ciphertext(ciphertext):
+def divide_ciphertext(ciphertext: str) -> None:
     """
     Plaintext is divided into blocks of 128 bits each. Last block might contain less than 128 bits.
 
@@ -74,7 +74,7 @@ def divide_ciphertext(ciphertext):
     ciphertext_blocks = [ciphertext[i:i + 32] for i in range(0, len(ciphertext), 32)]
 
 
-def key_schedule(key):
+def key_schedule(key: str) -> list[str]:
     """
     Implementation of the key scheduling algorithm from the AES-128 standard.
 
@@ -90,7 +90,7 @@ def key_schedule(key):
     return round_keys
 
 
-def compute_round_key(ante_key, key_round):
+def compute_round_key(ante_key: str, key_round: int) -> str:
     """
     Computes one round key. There are 10 rounds in the key scheduling algorithm and
     this function contains repetitive steps that apply for each of them.
@@ -115,7 +115,7 @@ def compute_round_key(ante_key, key_round):
     return round_key
 
 
-def pad_with_zeros(block):
+def pad_with_zeros(block: str) -> str:
     """
     This function aims to add additional zeros to the blocks which are less
     than 128 bits in length. Due to the fact that blocks are encoded in base16, the required length
@@ -133,7 +133,8 @@ def pad_with_zeros(block):
     return block
 
 
-def apply_main_transformations(plaintext_block, round_keys, original_block, mode='encrypt'):
+def apply_main_transformations(plaintext_block: str, round_keys: list[str],
+                               original_block: str, mode: str = 'encrypt') -> str:
     """
     Applies the transformation per 128-bits (or less) block, known as:
     substitution bytes, shift rows, mix columns and addition of round constants.
@@ -165,7 +166,7 @@ def apply_main_transformations(plaintext_block, round_keys, original_block, mode
     return xor_stream(get_ciphertext(np.transpose(state_matrix)), original_block)
 
 
-def convert_text_into_matrix(block):
+def convert_text_into_matrix(block: str) -> list[list[str]]:
     """
     Hexadecimal string is converted into 4x4 matrix. The matrix takes two hexa units for each
     of its elements.
@@ -180,7 +181,7 @@ def convert_text_into_matrix(block):
     return matrix
 
 
-def get_ciphertext(transposed_final_matrix):
+def get_ciphertext(transposed_final_matrix: list[list[str]]) -> str:
     """
     AES 4x4 matrix is converted back to hexadecimal string.
 
@@ -193,7 +194,7 @@ def get_ciphertext(transposed_final_matrix):
                    for i in range(0, 4) for j in range(0, 4))
 
 
-def apply_round_transformation(state_matrix, key, round_no):
+def apply_round_transformation(state_matrix: list[list[str]], key: str, round_no: int) -> list[list[str]]:
     """
     This function performs the round transformations on specified block. The block is kept as
     4x4 state matrix. The same matrix is changed during each round.
@@ -215,7 +216,7 @@ def apply_round_transformation(state_matrix, key, round_no):
     return state_matrix
 
 
-def apply_decryption_round_transformation(state_matrix, key, round_no):
+def apply_decryption_round_transformation(state_matrix: list[list[str]], key: str, round_no: int) -> list[list[str]]:
     """
     The customized succession of operations for decryption. Encryption operations are
     performed in reverse order (first comes the addition of round constants etc.)
@@ -237,7 +238,7 @@ def apply_decryption_round_transformation(state_matrix, key, round_no):
     return state_matrix
 
 
-def add_round_key(state_matrix, key):
+def add_round_key(state_matrix: list[list[str]], key: str) -> list[list[str]]:
     """
     The addition of round constants.
 
@@ -254,7 +255,7 @@ def add_round_key(state_matrix, key):
     return state_matrix
 
 
-def substitution_bytes(state_matrix, mode):
+def substitution_bytes(state_matrix: list[list[str]], mode: str) -> list[list[str]]:
     """
     The bytes substitution operation. The hexadecimal units are replaced with
     combinations provided by the special s-box matrix.
@@ -270,7 +271,7 @@ def substitution_bytes(state_matrix, mode):
     return [[s_box_transformation(state_matrix[i][j], mode) for j in range(4)] for i in range(4)]
 
 
-def shift_rows(state_matrix, shift_per_column):
+def shift_rows(state_matrix: list[list[str]], shift_per_column: list[int]) -> list[list[str]]:
     """
     The rows shifting operation. Rows are left shifted with number of elements
     provided by *shift_per_column* depending on the row index.
@@ -290,7 +291,7 @@ def shift_rows(state_matrix, shift_per_column):
     return new_state_matrix
 
 
-def mix_columns(state_matrix, mode='standard'):
+def mix_columns(state_matrix: list[list[str]], mode: str = 'standard') -> list[list[str]]:
     """
     The addition of round constants.
 
@@ -316,7 +317,7 @@ def mix_columns(state_matrix, mode='standard'):
     return multiply_matrices(fixed_matrix, state_matrix)
 
 
-def s_box_transformation(pair, mode='standard'):
+def s_box_transformation(pair: (str, str), mode : str = 'standard') -> str:
     """
     The s-box atomic substitution.
 
@@ -334,7 +335,7 @@ def s_box_transformation(pair, mode='standard'):
         return s_box_inverse[int(pair[0], 16)][int(pair[1], 16)]
 
 
-def xor_stream(key, rcon):
+def xor_stream(key: str, rcon: str) -> str:
     """
     This function is built with the purpose of xoring two hexa strings.
 
@@ -350,7 +351,7 @@ def xor_stream(key, rcon):
     return zeros + hexadecimal
 
 
-def xor_matrix(text, key):
+def xor_matrix(text: list[list[str]], key: list[list[str]]) -> list[list[str]]:
     """
     This function is built with the purpose of xoring two 4x4 hexa matrices.
 
@@ -365,7 +366,7 @@ def xor_matrix(text, key):
              for j in range(4)] for i in range(4)]
 
 
-def multiply_stream(y, x):
+def multiply_stream(y: str, x: str) -> str:
     """
     This function is built with the purpose of multiplying two hexa strings.
 
@@ -399,7 +400,7 @@ def multiply_stream(y, x):
     return zeros + hexadecimal
 
 
-def multiply_by_02(x):
+def multiply_by_02(x: str) -> str:
     """
     Special multiplication by ``02`` in ``GF(pow(2, 8))`` function.
     The input and output are still hexa strings.
@@ -416,7 +417,7 @@ def multiply_by_02(x):
     return x
 
 
-def multiply_matrices(static_m, dynamic_m):
+def multiply_matrices(static_m: list[list[str]], dynamic_m: list[list[str]]) -> list[list[str]]:
     """
     Multiplication of hexa matrices required at the mix columns operation.
 
@@ -440,7 +441,7 @@ def multiply_matrices(static_m, dynamic_m):
     return new_dynamic_m
 
 
-def add_one(counter):
+def add_one(counter: str) -> str:
     """
     This function performs adding one operation.
 
@@ -452,7 +453,7 @@ def add_one(counter):
     return hex(1 + int('0x' + counter, 16))[2:]
 
 
-def encrypt_aes128(plaintext):
+def encrypt_aes128(plaintext: str) -> (str, str, str):
     """
     This function performs AES-128 encryption in CTR mode. The operations being performed are:
         * key generation
@@ -464,7 +465,7 @@ def encrypt_aes128(plaintext):
     :param plaintext: the data to be encrypted
     :type plaintext: str
     :return: encrypted data
-    :rtype: str
+    :rtype: (str, str, str)
     """
     key = generate_128bits_random()
     divide_plaintext(plaintext)
@@ -480,15 +481,19 @@ def encrypt_aes128(plaintext):
     return key, counter, parallelize_ctr(counters, round_keys)
 
 
-def parallelize_ctr(counters, round_keys, mode='encrypt'):
+def parallelize_ctr(counters: list[str], round_keys: list[str], mode: str = 'encrypt') -> str:
     """
     This function implements the CTR mode for a set of counters through parallelization
     of the encryption required for each of them.
 
-    :param counters: list[str]
-    :param round_keys: list[str]
+    :param counters: the counters corresponding to each plaintext block in CTR mode
+    :type counters: list[str]
+    :param round_keys: round keys for encrypting counters
+    :type round_keys: list[str]
     :param mode: encrypt or decrypt depending on the operation performed on the text blocks
-    :return:
+    :type mode: str
+    :return: the ciphertext of the specified block in CTR mode
+    :rtype: str
     """
     with concurrent.futures.ProcessPoolExecutor(max_workers=8) as executor:
         processes = []
@@ -518,7 +523,7 @@ def parallelize_ctr(counters, round_keys, mode='encrypt'):
         return ciphertext
 
 
-def generate_128bits_random():
+def generate_128bits_random() -> str:
     """
     Exactly 128-bits random generation.
 
@@ -528,7 +533,7 @@ def generate_128bits_random():
     return hex(random.randint(2 ** 127, 2 ** 128 - 1))[2:]
 
 
-def decrypt_aes128(counter, ciphertext, key):
+def decrypt_aes128(counter: str, ciphertext: str, key: str) -> str:
     """
     This function performs AES-128 decryption in CTR mode. The operations being performed are:
         * key generation
@@ -537,6 +542,10 @@ def decrypt_aes128(counter, ciphertext, key):
         * encrypting counters in AES-128 CBC mode for single words
         * xoring counters with the blocks of ciphertext provided through parameter
 
+    :param key: the symmetric key generated at encryption
+    :type key: str
+    :param counter: the counter as starting point for CTR encryption
+    :type counter: str
     :param ciphertext: encrypted data
     :type ciphertext: str
     :return: original data

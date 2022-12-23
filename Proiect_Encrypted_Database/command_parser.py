@@ -4,7 +4,7 @@ starting from the user keyboard input.
 """
 
 
-def parse(command):
+def parse(command: str) -> (bool, int, list[str]):
     """
     It is designed to classify commands by assigning a request code and extract the necessary parameters from
     them. Some pre-established syntax rules are checked during the execution of this function, such as the number
@@ -31,7 +31,7 @@ def parse(command):
     return True, request_code, validation[1]
 
 
-def validate_command(request_code, params):
+def validate_command(request_code: int, params: list[str]) -> (bool, list[str]):
     """
     Splits validation into particular cases depending on the command type/request code the user issued.
     Significance of codes: 0 ~ upload; 1 ~ read; 2 ~ delete; 3 ~ exit.
@@ -52,7 +52,7 @@ def validate_command(request_code, params):
         return exit_validate(params)
 
 
-def upload_validate(params):
+def upload_validate(params: list[str]) -> (bool, list[str]):
     """
     Validates the upload parameters issued by user in the second part of his query.
 
@@ -67,7 +67,7 @@ def upload_validate(params):
         return False, []
 
 
-def delete_retrieve_validate(params):
+def delete_retrieve_validate(params: list[str]) -> (bool, list[str]):
     """
     Validates the read/delete parameters issued by user in the second part of his query.
     At least one of name and path must be specified.
@@ -95,7 +95,7 @@ def delete_retrieve_validate(params):
     return False, []
 
 
-def exit_validate(params):
+def exit_validate(params: list[str]) -> (bool, list[str]):
     """
     Validates the exit command which should consist of a single word and no parameters.
 

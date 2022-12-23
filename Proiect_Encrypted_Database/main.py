@@ -7,7 +7,7 @@ import rsa_oaep
 from command_parser import parse
 
 
-def create_workspace():
+def create_workspace() -> None:
     """
     This function (re)creates the application's table inside database.
     Using this function is recommended when targeting to clean the table's records
@@ -16,7 +16,7 @@ def create_workspace():
     create_files_table()
 
 
-def display_menu():
+def display_menu() -> None:
     """
     This function displays the possible commands a user can issue and their corresponding formatting rules.
     The commands' menu is printed on screen every time the user has to input a new command. This way all the rules
@@ -30,7 +30,7 @@ def display_menu():
     print("\u001b[33m Give me the command you wish to execute: ")
 
 
-def crypto(private_key):
+def crypto(private_key: int) -> str:
     """
     This function captures the interaction between the user and the application.
     This might be considered the top layer which encapsulates accessing the database, parsing the user's
@@ -55,7 +55,7 @@ def crypto(private_key):
             print("\u001b[35m" + solve_command(request, params, private_key))
 
 
-def extract_keys():
+def extract_keys() -> (int, int, int):
     """
     This function aims to extract the RSA keys from the local files where they are stored.
     The keys are stored in hexadecimal format. When extracted, they are also converted to big integers.
@@ -79,7 +79,7 @@ def extract_keys():
     return tuple(private_key)
 
 
-def create_keys():
+def create_keys() -> None:
     """
     This function replaces the old RSA keys with new ones, for security or maintenance reasons.
     This function must be run when starting the application for the first time (no RSA parameters have been created

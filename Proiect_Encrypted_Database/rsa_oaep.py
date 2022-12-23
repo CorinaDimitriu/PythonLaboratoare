@@ -11,14 +11,14 @@ import mgf1
 global public_key
 
 
-def compute_parameters():
+def compute_parameters() -> ((int, int, int), (int, int)):
     """
     This function uses lower layers such as *rsa_generator* and *miller_rabin* in order to
     generate large RSA keys. The size of ``p`` and ``q`` is established inside this function, so is ``e`` from
     the public key. There is a code block which enforces that e and (p-1), (q-1) are relatively prime to each other.
 
     :return: the pair consisting of one public and one private generated key
-    :rtype: ((int, int, int) ,(int, int))
+    :rtype: ((int, int, int), (int, int))
     """
     global public_key
     target_e = 2 ** 16 + 1
@@ -35,7 +35,7 @@ def compute_parameters():
     return public_key, private_key
 
 
-def encrypt_rsa(plaintext):  # plaintext is assumed to be an integer
+def encrypt_rsa(plaintext: int) -> int:
     """
     Implements the classic RSA encryption step, by raising the plaintext (as integer) to the power of ``e`` from
     the public key.
@@ -50,7 +50,7 @@ def encrypt_rsa(plaintext):  # plaintext is assumed to be an integer
     return pow(plaintext, e, n)
 
 
-def decrypt_rsa(ciphertext, private_key):  # ciphertext is assumed to be an integer
+def decrypt_rsa(ciphertext: int, private_key: (int, int)) -> int:
     """
     Implements the classic RSA decryption step, by raising the ciphertext (as integer) to the power of ``d`` from
     the private key. It is known that ``d`` from private key is the modular inverse of ``e`` from public key
@@ -70,7 +70,7 @@ def decrypt_rsa(ciphertext, private_key):  # ciphertext is assumed to be an inte
 
 
 # "all or nothing"
-def oaep_padding_encode(message, zeros, rand_bits):  # message is assumed to be an integer
+def oaep_padding_encode(message: int, zeros: int, rand_bits: int) -> (int, int):
     """
     Implementation of the encoding step of the OAEP padding scheme.
     The message is randomized before encryption in order
@@ -97,7 +97,7 @@ def oaep_padding_encode(message, zeros, rand_bits):  # message is assumed to be 
     return xor_message, xor_random
 
 
-def oaep_padding_decode(cipher, message_len, zeros, rand_bits):
+def oaep_padding_decode(cipher: int, message_len: int, zeros: int, rand_bits: int) -> int:
     """
     Implementation of the encoding step of the OAEP padding scheme. Some additional information
     such as the initial message's length is required.
@@ -124,7 +124,7 @@ def oaep_padding_decode(cipher, message_len, zeros, rand_bits):
     return int(str(bin(padded_message))[2:][:message_len], 2)
 
 
-def encrypt_rsa_oaep(plaintext):  # plaintext is assumed to be an integer
+def encrypt_rsa_oaep(plaintext: int) -> int:  # plaintext is assumed to be an integer
     """
     Implementation of the RSA-OAEP encryption step. First OAEP padding is performed,
     followed by RSA encryption on the padded plaintext.
@@ -141,7 +141,7 @@ def encrypt_rsa_oaep(plaintext):  # plaintext is assumed to be an integer
     return encrypt_rsa(int(str(bin(X))[2:] + binary_seed, 2))
 
 
-def decrypt_rsa_oaep(ciphertext, private_key, expected_len):  # plaintext is assumed to be an integer
+def decrypt_rsa_oaep(ciphertext: int, private_key: (int, int, int), expected_len: int) -> int:
     """
     Implementation of the RSA-OAEP decryption step. First RSA decryption on the ciphertext is performed,
     followed by OAEP decoding.

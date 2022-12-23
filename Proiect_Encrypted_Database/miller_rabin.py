@@ -1,7 +1,6 @@
 """
-This module represents tha ambition to implement the Miller-Rabin primality test.
+This module represents the ambition to implement the Miller-Rabin primality test.
 """
-
 
 import random
 import math
@@ -18,7 +17,7 @@ low_primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61
               911, 919, 929, 937, 941, 947, 953, 967, 971, 977, 983, 991, 997]
 
 
-def decompose_number(number):
+def decompose_number(number: int) -> (int, int):
     """
     In order to prepare for executing the Miller-Rabin primality test, the number
     is written as ``t * pow(2, s)``, where s is maximized and t is odd.
@@ -26,7 +25,7 @@ def decompose_number(number):
     :param number: the number to decompose, on which the Miller-Rabin test is to be performed
     :type number: int
     :return: s and t, the components of the number's decomposition as described
-    :rtype:
+    :rtype: (int, int)
     """
     t = number - 1
     s = 0
@@ -36,7 +35,7 @@ def decompose_number(number):
     return s, t
 
 
-def miller_rabin_test(number):
+def miller_rabin_test(number: int) -> bool:
     """
     The Miller-Rabin primality test implemented.
 
@@ -54,13 +53,13 @@ def miller_rabin_test(number):
     r = pow(a, t, number)
     if r in {1, number - 1}:
         return True
-    for i in range(1, s-1):
+    for i in range(1, s - 1):
         if pow(r, 2 ** i, number) == number - 1:
             return True
     return False
 
 
-def is_prime(number):
+def is_prime(number: int) -> bool:
     """
     This function tests for the primality of a number using the Miller-Rabin test. The target number is
     firstly tested against a couple of low primes. The reason behind this resides in the low performance

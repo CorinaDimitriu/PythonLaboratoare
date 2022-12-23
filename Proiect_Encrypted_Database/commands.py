@@ -11,7 +11,7 @@ import rsa_oaep
 import sha256
 
 
-def connect_to_database():
+def connect_to_database() -> pyodbc.Connection:
     """
     This function facilitates connecting the application module to the database in
     order to perform insertions, retrievals and deletions.
@@ -26,7 +26,7 @@ def connect_to_database():
     return conn
 
 
-def create_files_table():
+def create_files_table() -> None:
     """
     This function (re)creates the FILES table in order to keep metadata
     and cryptographic information about the target files.
@@ -53,7 +53,7 @@ def create_files_table():
     conn.close()
 
 
-def get_metadata(file_path):
+def get_metadata(file_path: str) -> (str, str, int, bool, bool, int, int, str, bool):
     """
     This function gathers metadata about the file located at *file_path*.
 
@@ -81,7 +81,7 @@ def get_metadata(file_path):
            can_write, owner, group, hash_digest, deleted
 
 
-def insert_encrypted_file(file_path, name):
+def insert_encrypted_file(file_path: str, name: str) -> str:
     """
     This is where the upload command is being executed. The file located at *file_path*,
     along with its metadata, is inserted into the database and will be further identified under *name*.
@@ -108,7 +108,8 @@ def insert_encrypted_file(file_path, name):
     return messages.Success
 
 
-def insert_all_data(name, file_path, encrypted_key, metadata):
+def insert_all_data(name: str, file_path: str, encrypted_key: str,
+                    metadata: (str, str, int, bool, bool, int, int, str, bool)) -> None:
     """
     This is where the database operations regarding the upload command are performed.
 
@@ -141,7 +142,7 @@ def insert_all_data(name, file_path, encrypted_key, metadata):
     conn.close()
 
 
-def retrieve_decrypted_file(private_key, name='', path=''):
+def retrieve_decrypted_file(private_key: (int, int, int), name: str = '', path: str = '') -> str:
     """
     This is where the read command is being executed. The content of the target file is
     displayed to the user. The content of the file is decrypted using the asymmetric key stored
@@ -149,7 +150,7 @@ def retrieve_decrypted_file(private_key, name='', path=''):
 
     :param private_key: the private RSA key for decrypting the asymmetric key
         stored within the FILES table
-    :type private_key: int
+    :type private_key: (int, int, int)
     :param name: the unique identifier of the target file (optional)
     :type name: str
     :param path: the path to the target file (optional)
@@ -176,7 +177,7 @@ def retrieve_decrypted_file(private_key, name='', path=''):
     return bytes.fromhex(hexadecimal).decode(reader.get_format(path))
 
 
-def retrieve_from_database(name, path):
+def retrieve_from_database(name: str, path: str) -> (str, str, int):
     """
     This is where the database operations regarding the read command are performed.
 
@@ -211,7 +212,7 @@ def retrieve_from_database(name, path):
     return name, path, encrypted_key
 
 
-def delete_file(name='', path=''):  # if both parameters specified, only name is taken into account
+def delete_file(name: str = '', path: str = '') -> str:  # if both parameters specified, only name is taken into account
     """
     This is where the delete command is being executed.
 
@@ -248,7 +249,7 @@ def delete_file(name='', path=''):  # if both parameters specified, only name is
     return messages.Success
 
 
-def solve_command(request_code, params, private_key):  # includes treating exceptions
+def solve_command(request_code: int, params: list[str], private_key: (int, int, int)) -> str:  # includes treating exceptions
     """
     This function implements command solving as far as user's inputs are concerned. After passing
     through a pre-processing step and acquiring the green flag for validation, the command is split into
@@ -262,7 +263,7 @@ def solve_command(request_code, params, private_key):  # includes treating excep
     :type params: list[str]
     :param private_key: the private RSA key serving for decryption of the symmetric key
         used in AES-128
-    :type private_key: int
+    :type private_key: (int, int, int)
     :return: the result of the operation (file content or specific messages)
     :rtype: str
     """

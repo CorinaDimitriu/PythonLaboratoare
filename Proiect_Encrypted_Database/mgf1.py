@@ -5,7 +5,7 @@ import math
 import sha256
 
 
-def mgf(mask_length, seed):  # seed is assumed to be an integer
+def mgf(mask_length: int, seed: int) -> str:
     """
     This is a mask generation function (mgf) based on sha-256 hash function.
     Essentially, the seed is given to the hash function. This operation repeats

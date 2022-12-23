@@ -14,7 +14,7 @@ round_constants = [0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0
                    0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2]
 
 
-def initialize_sha256():
+def initialize_sha256() -> None:
     """
     This function initializes the hashes list which will be used during sha-256
      digest computing and converts all 8 of them to binary format.
@@ -24,7 +24,7 @@ def initialize_sha256():
     convert_hashes_to_binary()
 
 
-def convert_hashes_to_binary():
+def convert_hashes_to_binary() -> None:
     """
     This function converts integers to octet strings.
     The target integers are the hashes required by the digest computing algorithm.
@@ -34,7 +34,7 @@ def convert_hashes_to_binary():
     hashes = [''.join('0' for _ in range(32 - len(hashes[i]))) + hashes[i] for i in range(8)]
 
 
-def add_one():
+def add_one() -> None:
     """
     This function adds a bit set on 1 at the end of the message/plaintext.
     """
@@ -42,7 +42,7 @@ def add_one():
     plaintext += '1'
 
 
-def add_length():
+def add_length() -> None:
     """
     This function replaces the last 64 bytes of the plaintext with the length
     of the initial message in binary form.
@@ -54,7 +54,7 @@ def add_length():
     plaintext += len_in_binary
 
 
-def padding_until_512_less64():
+def padding_until_512_less64() -> None:
     """
     This function pads the plaintext with 0’s until data is a multiple of 512, less 64 bits (448 bits).
     """
@@ -66,7 +66,7 @@ def padding_until_512_less64():
     plaintext = plaintext[:-64]
 
 
-def pre_processing():
+def pre_processing() -> None:
     """
     This function encapsulates the pre-processing operations performed on the plaintext before
     actually computing the hash digest: adding a one bit, padding with 0's and adding the length at the end.
@@ -76,7 +76,7 @@ def pre_processing():
     add_length()
 
 
-def split_plaintext_into_blocks():
+def split_plaintext_into_blocks() -> None:
     """
     This function splits the plaintext into 512-bits blocks.
     The blocks are encoded as octet strings.
@@ -85,7 +85,7 @@ def split_plaintext_into_blocks():
     plaintext_blocks = [plaintext[i:i + 512] for i in range(0, len(plaintext), 512)]
 
 
-def apply_main_transformations():
+def apply_main_transformations() -> None:
     """
     This function iterates through the 512-bit blocks and updates the hashes.
     Eventually, it computes the digest after the last block has passed through
@@ -97,7 +97,7 @@ def apply_main_transformations():
     return compute_digest(hashes)
 
 
-def apply_main_block_transformation(plain_block):
+def apply_main_block_transformation(plain_block: str) -> None:
     """
     This function iterates through all the steps required for binary blocks in order to update
     hashes at the end of each round of transformations per block.
@@ -120,7 +120,7 @@ def apply_main_block_transformation(plain_block):
     modify_hashes_within_chunk_loop(particular_hashes)
 
 
-def create_hashes():
+def create_hashes() -> list[str]:
     """
     This function ensures that, at the beginning of each round of transformations per block,
     the operations start with the updated version of the hashes, which was obtained during
@@ -132,7 +132,7 @@ def create_hashes():
     return particular_hashes
 
 
-def modify_hashes_within_chunk_loop(particular_hashes):
+def modify_hashes_within_chunk_loop(particular_hashes: list[str]) -> None:
     """
     This function performs addition between the last version of the hashes
     (last updated at the end of the previous round of transformations per block)
@@ -147,7 +147,7 @@ def modify_hashes_within_chunk_loop(particular_hashes):
     hashes = [addition(hashes[i], particular_hashes[i]) for i in range(8)]
 
 
-def create_message_schedule(bytes_array32):
+def create_message_schedule(bytes_array32: list[str]) -> list[str]:
     """
     This function updates the last 48 32-bit blocks of the plaintext by combining
     right rotations, right shifts and additions on the previous blocks.
@@ -170,16 +170,16 @@ def create_message_schedule(bytes_array32):
     return bytes_array32
 
 
-def compression(bytes32, counter, copy_hashes):
+def compression(bytes32: str, counter: int, copy_hashes: list[str]) -> list[str]:
     """
     The compression function mixes the hashes from the previous round of transformations per block
     by performing right rotations, &-operations, not-operations, switching and additions on them.
     The 32-bit plaintext block prove their utility during additions.
 
     :param bytes32: the current 32-bit block
-    :type bytes32: list[str]
+    :type bytes32: str
     :param counter: the index of the block
-    :type counter: str
+    :type counter: int
     :param copy_hashes: the current version of the hashes
     :type copy_hashes: list[str]
     :return: the updated version of the hashes
@@ -211,7 +211,7 @@ def compression(bytes32, counter, copy_hashes):
     return copy_hashes
 
 
-def compute_digest(particular_hashes):
+def compute_digest(particular_hashes: list[str]) -> str:
     """
     This function joins all hashes into an octet string.
 
@@ -223,7 +223,7 @@ def compute_digest(particular_hashes):
     return ''.join(particular_hashes[i] for i in range(8))
 
 
-def right_rotate(text, bits):
+def right_rotate(text: str, bits: int) -> str:
     """
     This function moves to the end a couple of bits located at the beginning of the octet string.
 
@@ -239,7 +239,7 @@ def right_rotate(text, bits):
     return text
 
 
-def right_shift(text, bits):
+def right_shift(text: str, bits: int) -> str:
     """
     This function performs right-shifting with a number of bits on *text*.
 
@@ -253,7 +253,7 @@ def right_shift(text, bits):
     return ''.join(['0' for _ in range(bits)]) + text[:-bits]
 
 
-def xor(bytes1, bytes2):
+def xor(bytes1: str, bytes2: str) -> str:
     """
     This function performs xor (particular binary addition) between two octet strings.
 
@@ -269,7 +269,7 @@ def xor(bytes1, bytes2):
     return binary
 
 
-def addition(bytes1, bytes2):
+def addition(bytes1: str, bytes2: str) -> str:
     """
     This function performs addition between two octet strings. The octet strings are firstly
     converted to integers, so that modulo ``pow(2, 32)`` addition can be performed.
@@ -286,7 +286,7 @@ def addition(bytes1, bytes2):
     return binary
 
 
-def and_operation(bytes1, bytes2):
+def and_operation(bytes1: str, bytes2: str) -> str:
     """
     This function performs *and* operation between two octet strings. The octet strings are firstly
     converted to integers and additional bytes are added if necessary to obtain a complete 32-bit block.
@@ -303,7 +303,7 @@ def and_operation(bytes1, bytes2):
     return binary
 
 
-def not_operation(bytes_only):
+def not_operation(bytes_only: str) -> str:
     """
     This function operates on a bit block and negates it, by reversing all its bits.
     More precisely, the length stays the same, all the 0's become 1's and all the 1's become 0's.
@@ -317,7 +317,7 @@ def not_operation(bytes_only):
                     for i in range(0, len(bytes_only))])
 
 
-def execute_sha256(user_plaintext):
+def execute_sha256(user_plaintext: str) -> str:
     """
     This function concatenates all the necessary steps for computing sha-256 binary digest.
     Details about pre-processing, 512-bit and 32-bit (*atomic*) block transformations are listed

@@ -4,11 +4,13 @@ Advanced elements such as images, charts, passwords may cause unusual behaviour 
 """
 
 import os
+import typing
+
 import docx
 from PyPDF2 import PdfReader
 
 
-def read_data(file_path):  # output is in base16
+def read_data(file_path: str) -> str:  # output is in base16
     """
     This function aims to read the content of the specified file, taking its extension
     into consideration as a hint for its formatting type (Windows OS).
@@ -35,12 +37,12 @@ def read_data(file_path):  # output is in base16
     return content
 
 
-def txt_reader(file):
+def txt_reader(file: typing.BinaryIO) -> str:
     """
     Reads content of txt files.
 
     :param file: the file descriptor
-    :type: int
+    :type: typing.BinaryIO
     :return: the content of the file encoded in hexadecimal format
     :rtype: str
     """
@@ -48,7 +50,7 @@ def txt_reader(file):
     return content.hex()
 
 
-def docx_reader(file_path):
+def docx_reader(file_path: str) -> str:
     """
     Reads content of docx files.
 
@@ -66,7 +68,7 @@ def docx_reader(file_path):
     return data.encode('utf-8').hex()
 
 
-def pdf_reader(file_path):
+def pdf_reader(file_path: str) -> str:
     """
     Reads content of pdf files.
 
@@ -85,7 +87,7 @@ def pdf_reader(file_path):
     return data.encode('utf-8').hex()
 
 
-def get_format(path):
+def get_format(path: str) -> str:
     """
     This function aims to provide other services of the application with suitable
     decoding formats depending on the file type/extension on Windows OS.
